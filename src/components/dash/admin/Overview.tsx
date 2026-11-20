@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
 import { useState } from "react";
 import { appStageLabel, ago, hoursLeft, counts, dayDiff, longDate, openStage, rupees, sameMonth, shortDate, stageLabel, stages, teamUnread, useDb, type Db } from "@/lib/mock-db";
@@ -97,7 +97,7 @@ export function Overview() {
                   <tr key={a.id} className="hover:bg-wash">
                     <td className={td}>
                       <Link href={`/admin/applications?open=${a.id}`} className="flex items-center gap-2.5">
-                        <Image src={a.photo} alt="" width={30} height={30} className="h-[30px] w-[30px] rounded-full object-cover" />
+                        <Avatar src={a.photo} name={a.name} size={30} />
                         <span>
                           {a.name}
                           <small className={sub}>

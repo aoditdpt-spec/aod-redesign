@@ -267,13 +267,13 @@ function seed(today: Date, now: number) {
     ["ART-208", "Neel Shah", "Stand-Up Comedian", ["comedians"], "Rajkot", "comedians.jpg", -120],
     ["ART-209", "Ria Kapoor", "Model", ["models-creators"], "Vadodara", "models.jpg", -90],
     ["ART-210", "Anaya Singh", "Singer", ["musicians-djs"], "Surat", "singers.jpg", -60],
-  ].map(([id, name, craft, cats, city, photo, since], i) => ({
+  ].map(([id, name, craft, cats, city, , since], i) => ({
     id: id as string,
     name: name as string,
     craft: craft as string,
     cats: cats as string[],
     city: city as string,
-    photo: `/categories/${photo}`,
+    photo: "", // no sample photos (on request, 2026-11-20): initials show instead
     email: `${(name as string).toLowerCase().replace(" ", ".")}@example.com`,
     phone: `55${String(20000000 + i * 104729).slice(0, 8)}`,
     since: day(since as number),
@@ -289,13 +289,13 @@ function seed(today: Date, now: number) {
     ["APP-233", "Arjun Patel", "Reel Creator", "models-creators", "Ahmedabad", "content-creators.webp", -13, "review"],
     ["APP-232", "Rohan Iyer", "DJ", "musicians-djs", "Gandhinagar", "musicians-djs.jpg", -20, "approved"],
     ["APP-231", "Kavya Shah", "Model", "models-creators", "Surat", "models.jpg", -22, "rejected"],
-  ].map(([id, name, craft, cat, city, photo, applied, stage, meetDay, meetHour], i) => ({
+  ].map(([id, name, craft, cat, city, , applied, stage, meetDay, meetHour], i) => ({
     id: id as string,
     name: name as string,
     craft: craft as string,
     cat: cat as string,
     city: city as string,
-    photo: `/categories/${photo}`,
+    photo: "", // no sample photos (on request, 2026-11-20): initials show instead
     applied: day(applied as number),
     stage: stage as AppStage,
     meetingAt: meetDay === undefined ? undefined : new Date(today.getTime() + (meetDay as number) * DAY + (meetHour as number) * 3600_000).toISOString(),
@@ -492,7 +492,7 @@ function sentApplications(): Application[] {
       craft: a.craft || catName(a.cat) || "Artist",
       cat: a.cat,
       city: a.city || "Not Given",
-      photo: a.photo || "/categories/photographers.jpg",
+      photo: a.photo || "",
       applied: a.at.slice(0, 10),
       stage: "review" as AppStage,
       email: a.email,
@@ -829,7 +829,7 @@ export const act = {
   // ---- artists and applications
   addArtist(a: Omit<Artist, "id" | "since" | "active">) {
     const id = `ART-${211 + (readPatch().artists ?? []).length}`;
-    const artist: Artist = { ...a, id, since: dayKey(new Date()), active: true, photo: a.photo || "/categories/photographers.jpg" };
+    const artist: Artist = { ...a, id, since: dayKey(new Date()), active: true, photo: a.photo || "" };
     change((p) => ({ ...p, artists: [...(p.artists ?? []), artist] }), { text: `Added artist ${artist.name}` });
     return id;
   },

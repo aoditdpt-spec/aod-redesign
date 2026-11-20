@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Avatar } from "@/components/ui/Avatar";
 import { useState } from "react";
 import { categories, cities } from "@/data/site";
 import { act, ago, appStageLabel, appStages, catName, openStage, shortDate, stageLabel, useDb, type AppStage, type Artist } from "@/lib/mock-db";
@@ -44,7 +44,7 @@ export function Applications() {
             <tr key={a.id} className="cursor-pointer hover:bg-wash" onClick={() => o.open(a.id)}>
               <td className={td}>
                 <span className="flex items-center gap-2.5">
-                  <Image src={a.photo} alt="" width={30} height={30} className="h-[30px] w-[30px] rounded-full object-cover" />
+                  <Avatar src={a.photo} name={a.name} size={30} />
                   <button type="button" className="text-left" onClick={() => o.open(a.id)}>
                     {a.name}
                     <small className={sub}>
@@ -69,7 +69,7 @@ export function Applications() {
       <Drawer open={!!open} onClose={o.close} title={open?.name ?? ""} subtitle={open ? `${open.id} · ${open.craft}` : undefined}>
         {open && (
           <div className="space-y-8">
-            <Image src={open.photo} alt="" width={96} height={96} className="h-24 w-24 rounded-full object-cover" />
+            <Avatar src={open.photo} name={open.name} size={96} />
             <Rows
               rows={[
                 ["Stage", appStageLabel(open.stage)],
@@ -159,7 +159,7 @@ export function Artists() {
             <tr key={a.id} className="cursor-pointer hover:bg-wash" onClick={() => o.open(a.id)}>
               <td className={td}>
                 <span className="flex items-center gap-2.5">
-                  <Image src={a.photo} alt="" width={30} height={30} className="h-[30px] w-[30px] rounded-full object-cover" />
+                  <Avatar src={a.photo} name={a.name} size={30} />
                   <button type="button" className="text-left" onClick={() => o.open(a.id)}>
                     {a.name}
                     <small className={sub}>
@@ -185,7 +185,7 @@ export function Artists() {
       <Drawer open={!!open} onClose={o.close} title={open?.name ?? ""} subtitle={open ? `${open.id} · ${open.craft}` : undefined}>
         {open && (
           <div className="space-y-8">
-            <Image src={open.photo} alt="" width={96} height={96} className="h-24 w-24 rounded-full object-cover" />
+            <Avatar src={open.photo} name={open.name} size={96} />
             <Rows
               rows={[
                 ["Status", open.active ? "Active" : "Paused"],

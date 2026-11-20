@@ -215,7 +215,9 @@ function BusinessApp({ company }: { company: Company }) {
         </button>
       </div>
 
-      <div role="tablist" aria-label="Business portal" className="mt-10 flex gap-5 overflow-x-auto border-b border-line text-base sm:mt-12 sm:gap-6 sm:text-lg">
+      {/* The tabs: a thin line under them (an inset shadow, so the row has no scrollbar or
+          arrows); on a narrow phone it slides sideways with no scrollbar showing. */}
+      <div role="tablist" aria-label="Business portal" className="mt-10 flex gap-5 overflow-x-auto overflow-y-hidden text-base shadow-[inset_0_-1px_0_var(--color-line)] [scrollbar-width:none] sm:mt-12 sm:gap-6 sm:text-lg [&::-webkit-scrollbar]:hidden">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -227,7 +229,7 @@ function BusinessApp({ company }: { company: Company }) {
               setOpen(null);
               setBookDate(undefined);
             }}
-            className={`-mb-px shrink-0 border-b-2 pb-3 transition-colors ${tab === t.id ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
+            className={`shrink-0 border-b-2 pb-3 transition-colors ${tab === t.id ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
           >
             {t.label}
           </button>

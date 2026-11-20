@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { categories } from "@/data/site";
 import { eventMinutes, timeRange } from "@/lib/event-time";
@@ -58,7 +57,8 @@ export function EventRows({ b }: { b: Booking }) {
   );
 }
 
-// "Shortlisted For You": the artists' profiles (photo, craft, city), the chosen ones marked.
+// "Shortlisted For You": the artists' profiles (name, craft, city; no photos, on request
+// 2026-11-20), the chosen ones marked.
 export function ArtistCards({ db, b }: { db: Db; b: Booking }) {
   const ids = [...new Set([...b.assigned, ...b.shortlist])];
   const list = ids.map((id) => db.artists.find((a) => a.id === id)).filter((a) => !!a);
@@ -66,8 +66,7 @@ export function ArtistCards({ db, b }: { db: Db; b: Booking }) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2">
       {list.map((a) => (
-        <li key={a.id} className="flex items-center gap-4 rounded-xl border border-line p-4">
-          <Image src={a.photo} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-full object-cover" />
+        <li key={a.id} className="rounded-xl border border-line p-4">
           <div className="min-w-0">
             <p className="font-medium">{a.name}</p>
             <p className="text-sm text-muted">

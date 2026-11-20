@@ -129,7 +129,7 @@ export function Dashboard() {
   );
 }
 
-const samplePortfolio = ["photographers.jpg", "cinematographers.jpg", "drone-pilots.jpg", "models.jpg", "singers.jpg", "makeup-artists.jpg", "anchors-hosts.jpg", "musicians-djs.jpg", "comedians.jpg", "editors.jpg"].map((f) => `/categories/${f}`);
+const samplePortfolio: string[] = []; // no sample photos (on request, 2026-11-20); files the artist adds show here
 
 function SendUpdate({ db }: { db: Db }) {
   return (

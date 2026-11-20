@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Avatar } from "@/components/ui/Avatar";
 import { useState } from "react";
 import { timeRange } from "@/lib/event-time";
 import { rupees, shortDate, teamUnread, templates, useDb } from "@/lib/mock-db";
@@ -27,7 +27,7 @@ export function Chat() {
             return (
               <li key={a.id} className="shrink-0">
                 <button type="button" onClick={() => setPick(a.id)} className={`flex w-full items-center gap-2.5 border-b border-line py-2.5 text-left max-md:rounded-lg max-md:border max-md:px-3 ${a.id === current ? "font-medium" : "text-muted hover:text-ink"}`}>
-                  <Image src={a.photo} alt="" width={30} height={30} className="h-[30px] w-[30px] shrink-0 rounded-full object-cover" />
+                  <Avatar src={a.photo} name={a.name} size={30} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-ink">{a.name}</span>
                     <small className="block truncate text-xs text-muted max-md:hidden">{last(a.id)?.text ?? "No messages yet"}</small>

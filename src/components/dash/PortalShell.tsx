@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -49,7 +50,7 @@ export function PortalShell({ children }: { children: ReactNode }) {
         <div className="mt-auto hidden md:block">
           {me && (
             <div className="flex items-center gap-2.5 text-sm">
-              <Image src={me.photo} alt="" width={32} height={32} className="h-8 w-8 rounded-full object-cover" />
+              <Avatar src={me.photo} name={me.name} size={32} />
               <div>
                 {db?.profile.name}
                 <small className="block text-xs text-muted">{me.craft}</small>

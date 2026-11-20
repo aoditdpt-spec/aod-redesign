@@ -30,15 +30,18 @@ export function MonthGrid({ month, cell, compact = false }: { month: Date; cell:
   );
 }
 
+// Previous / Next as clear outlined buttons either side of the month (on request, 2026-11-20).
+const monthButton = "h-10 rounded-full border border-ink px-4 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-paper";
+
 export function MonthSwitch({ month, onChange }: { month: Date; onChange: (m: Date) => void }) {
   const shift = (n: number) => onChange(new Date(month.getFullYear(), month.getMonth() + n, 1));
   return (
-    <div className="flex items-center gap-3 text-[13px]">
-      <button type="button" onClick={() => shift(-1)} className="text-muted hover:text-ink">
+    <div className="flex items-center gap-2 sm:gap-3">
+      <button type="button" onClick={() => shift(-1)} className={monthButton}>
         Previous
       </button>
-      <span className="min-w-28 text-center font-medium text-ink">{month.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
-      <button type="button" onClick={() => shift(1)} className="text-muted hover:text-ink">
+      <span className="min-w-32 text-center text-base font-medium text-ink">{month.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</span>
+      <button type="button" onClick={() => shift(1)} className={monthButton}>
         Next
       </button>
     </div>
