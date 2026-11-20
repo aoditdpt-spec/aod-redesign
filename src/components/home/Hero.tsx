@@ -14,7 +14,7 @@ export function Hero() {
         <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end lg:gap-16">
           <h1 aria-label={hero.label} className="overflow-x-clip text-[2.2rem] sm:text-5xl lg:text-6xl">
             {/* The word sits on its own line, so the heading never reflows as it changes. */}
-            <ScrambleWord lead={hero.before} words={hero.words} className="block whitespace-nowrap" />
+            <ScrambleWord lead={hero.before} words={hero.words} stop className="block whitespace-nowrap" />
           </h1>
           <Reveal delay={0.05} className="lg:w-80">
             <p className="text-sm text-muted">{promises.title}</p>

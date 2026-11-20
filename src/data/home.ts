@@ -11,7 +11,8 @@ export const hero = {
 
 // The grid under the hero's heading (HeroMosaic.tsx): 5 columns by 2 rows on laptops, text and
 // photos taking turns (text, photo, text, photo, text / photo, text, photo, text, photo), in the
-// style of snappr.com. Photos: the owner's set (public/home).
+// style of snappr.com. Photos: the owner's set (public/home); the model and the singer swapped places
+// and the drone pilot took the comedian's place (2026-11-20).
 // PLACEHOLDER FIGURES, on request (2026-11-19, "pure larp"): these numbers are not real AOD data.
 // The old-site audit rule is to show only real numbers, so replace them with real figures (or
 // remove them) before launch.
@@ -19,23 +20,23 @@ export const heroMosaic: ({ kind: "text"; value: string; label: string } | { kin
   { kind: "text", value: "100K+", label: "Photos Shot" },
   { kind: "photo", src: "/home/photographer-main.jpg", alt: "A photographer setting up a camera in a studio" },
   { kind: "text", value: "60K+", label: "Frames Of Video Delivered" },
-  { kind: "photo", src: "/home/singer.jpg", alt: "A singer on stage" },
+  { kind: "photo", src: "/home/model.jpg", alt: "A model at a studio shoot" },
   { kind: "text", value: "500+", label: "Hours Of Live Music" },
   { kind: "photo", src: "/home/anchor.jpg", alt: "An anchor on stage at a corporate event" },
   { kind: "text", value: "20+", label: "Events Hosted By Our Anchors" },
-  { kind: "photo", src: "/home/comedian.jpg", alt: "A stand-up comedian with the audience" },
+  { kind: "photo", src: "/home/drone-pilot.jpg", alt: "A drone pilot flying a drone at sunset" },
   { kind: "text", value: "1M+", label: "Views On Reels We Made" },
-  { kind: "photo", src: "/home/model.jpg", alt: "A model at a studio shoot" },
+  { kind: "photo", src: "/home/singer.jpg", alt: "A singer on stage" },
 ];
 
 // Each category's picture on the homepage cards (public/categories/icons): the owner's set, made in
 // the style of Urban Company's category icons (2026-11-19): people at work, on white (the cards
-// blend the white away). Stand-Up Comedians keeps the earlier picture (the new set has none).
+// blend the white away). Stand-Up Comedians is the owner's comedian with a mic (2026-11-20).
 export const categoryIcons: Record<string, string> = {
   "photo-video": "/categories/icons/portrait-photographer.png",
   "anchors-hosts": "/categories/icons/portrait-anchor.png",
   "musicians-djs": "/categories/icons/portrait-musician.png",
-  comedians: "/categories/icons/icon-comedian.png",
+  comedians: "/categories/icons/portrait-comedian.png",
   "models-creators": "/categories/icons/portrait-model.png",
   "makeup-styling": "/categories/icons/portrait-makeup-brush.png",
 };

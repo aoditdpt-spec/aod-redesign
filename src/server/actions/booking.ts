@@ -21,7 +21,7 @@ export type BookingInput = {
   kinds?: string[]; // the kinds of artist picked in question 02 (Photographers, DJs…)
   occasion?: string; // question 03
   brief?: string; // for the artists
-  lines?: { category: string; name: string; count: number }[]; // how many of each kind (question 02)
+  lines?: { category: string; name: string; count: number }[]; // how many of each kind (question 02, under the kinds)
   date: string; // yyyy-mm-dd
   startTime: string; // HH:MM
   endTime: string; // HH:MM (earlier than the start = ends after midnight)

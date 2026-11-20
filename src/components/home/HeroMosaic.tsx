@@ -26,13 +26,16 @@ export function HeroMosaic() {
               />
             </div>
           ) : (
-            // The text tiles: white on black, with only the "+" in orange.
-            <div className="flex h-full w-full flex-col justify-between rounded-lg bg-ink p-4 text-paper sm:rounded-xl lg:p-6">
-              <span className="text-4xl font-medium tracking-tight tabular-nums lg:text-5xl">
-                {t.value.replace(/\+$/, "")}
-                {t.value.endsWith("+") && <span className="text-brand">+</span>}
-              </span>
-              <span className="text-sm leading-snug lg:text-base">{t.label}</span>
+            // The text tiles: white on black, with only the "+" in orange. They zoom in on hover
+            // like the photos (the tile stays put, its content grows inside it).
+            <div className="h-full w-full overflow-hidden rounded-lg bg-ink text-paper sm:rounded-xl">
+              <div className="flex h-full w-full flex-col justify-between p-4 transition-transform duration-700 ease-out hover:scale-[1.04] lg:p-6">
+                <span className="text-4xl font-medium tracking-tight tabular-nums lg:text-5xl">
+                  {t.value.replace(/\+$/, "")}
+                  {t.value.endsWith("+") && <span className="text-brand">+</span>}
+                </span>
+                <span className="text-sm leading-snug lg:text-base">{t.label}</span>
+              </div>
             </div>
           )}
         </StaggerItem>

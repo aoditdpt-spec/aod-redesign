@@ -22,9 +22,11 @@ import { VenueField, blankVenue, type Venue } from "@/components/ui/VenueField";
 // The booking request, with as few clicks as possible (on request, 2026-11-19): each pick moves on
 // by itself, with no Next button.
 //   01 Who Are You Looking For?  tap one category
-//   02 Which Kind Of Artist?     tap one kind (skipped when the category has only one)
-//   03 How Many?                 tap a number (nothing picked to start with); More opens a box up to 20
-//   04 When, Where And Your Details   the event, then name, phone and email; Send OTP, then Confirm
+//   02 Which Kind Of Artist?     tap one kind, then How Many? below it on the same question: 1, 2, 3
+//                                or More (a box for 4 to 20); nothing picked to start with. A category
+//                                with only one kind asks How Many? alone. Tapping a number moves on.
+//   03 When, Where And Your Details   date, start time, how many hours, where, anything else, then
+//                                name, phone and email; Send OTP, then Confirm
 //      Request saves it straight away (no review page) and says "Request Received." with the ref.
 // The answers so far show as chips that jump back; Back, Undo and Clear All sit by the progress.
 // Business events are booked from the company's account (/business), as on aod.co.in: there the
@@ -74,12 +76,12 @@ const tile = (on: boolean) => `rounded-xl border text-left font-medium leading-t
 const textButton = "text-sm font-medium text-ink underline underline-offset-4 hover:text-brand disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40";
 const blank = { date: "", time: "", hours: 0, venue: blankVenue as Venue, details: "", name: "", phone: "", email: "" };
 const LAST = p.steps.length - 1;
-const COUNTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const COUNTS = [1, 2, 3]; // then More, a box for 4 to 20
 
 type Contact = { name: string; phone: string; email: string };
 type Snapshot = { step: number; cat: string | null; kind: string | null; count: number | null; form: typeof blank };
 
-export function BookForm({ forceAudience, contact, presetCategory }: { forceAudience?: Audience; contact?: Contact; presetCategory?: string }) {
+export function BookForm({ forceAudience, contact, presetCategory, presetDate }: { forceAudience?: Audience; contact?: Contact; presetCategory?: string; presetDate?: string }) {
   const chosenAudience = useAudience();
   const router = useRouter();
   const toBusiness = !forceAudience && chosenAudience === "business";
@@ -97,10 +99,11 @@ export function BookForm({ forceAudience, contact, presetCategory }: { forceAudi
         </Link>
       </p>
     );
-  return <Questions audience={forceAudience ?? chosenAudience} forced={!!forceAudience} contact={contact} presetCategory={presetCategory} />;
+  return <Questions audience={forceAudience ?? chosenAudience} forced={!!forceAudience} contact={contact} presetCategory={presetCategory} presetDate={presetDate} />;
 }
 
-function Questions({ audience, forced, contact, presetCategory }: { audience: Audience | null | "unknown"; forced: boolean; contact?: Contact; presetCategory?: string }) {
+// `presetDate` ("YYYY-MM-DD"): the event date already filled in (a day picked on the business calendar).
+function Questions({ audience, forced, contact, presetCategory, presetDate }: { audience: Audience | null | "unknown"; forced: boolean; contact?: Contact; presetCategory?: string; presetDate?: string }) {
   const queryPreset = usePreset();
   const preset = categories.some((c) => c.slug === (presetCategory ?? queryPreset)) ? (presetCategory ?? queryPreset) : "";
   const minDate = useTomorrow();
@@ -110,14 +113,14 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
   const single = category ? category.types.length <= 1 : false;
   // A preset category opens at its next question.
   const [stepState, setStep] = useState<number | null>(null);
-  const step = stepState ?? (preset ? (single ? 2 : 1) : 0);
+  const step = stepState ?? (preset ? 1 : 0);
   const [dir, setDir] = useState(1);
   const [kindState, setKind] = useState<string | null>(null);
   const kind = single ? (category?.types[0] ?? category?.name ?? null) : kindState;
   const [count, setCount] = useState<number | null>(null); // nothing picked to start with
   const [more, setMore] = useState("");
   const [showMore, setShowMore] = useState(false);
-  const [form, setForm] = useState(() => ({ ...blank, ...contact }));
+  const [form, setForm] = useState(() => ({ ...blank, date: presetDate ?? "", ...contact }));
   const [history, setHistory] = useState<Snapshot[]>([]);
   const [missing, setMissing] = useState<string[]>([]);
   const [view, setView] = useState<"form" | "done">("form");
@@ -200,25 +203,26 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
     setMissing([]);
     goStep(0);
   }
-  // Back: the question before, skipping Which Kind when the category has only one.
-  const back = () => goStep(step === 2 && single ? 0 : step - 1);
+  const back = () => goStep(step - 1);
 
   const pickCategory = (slug: string) => {
     remember();
-    const c = categories.find((x) => x.slug === slug);
     if (slug !== cat) {
       setKind(null);
       setCount(null);
       setShowMore(false);
     }
     setPicked(slug);
-    goStep(c && c.types.length > 1 ? 1 : 2);
+    goStep(1);
   };
+  // Picking a kind stays on question 02, where How Many? appears under the kinds.
   const pickKind = (k: string) => {
     remember();
-    if (k !== kindState) setCount(null);
+    if (k !== kindState) {
+      setCount(null);
+      setShowMore(false);
+    }
     setKind(k);
-    goStep(2);
   };
   const pickCount = (n: number) => {
     remember();
@@ -350,8 +354,7 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
   // The answers so far, as chips that jump back to their question.
   const chips = [
     { text: category?.name ?? "", step: 0 },
-    { text: single ? "" : (kind ?? ""), step: 1 },
-    { text: count ? needsText : "", step: 2 },
+    { text: count ? needsText : single ? "" : (kind ?? ""), step: 1 },
   ].filter((c) => c.text && c.step < step);
 
   if (view === "done")
@@ -451,7 +454,7 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
             >
               <p className="text-sm text-muted">{String(step + 1).padStart(2, "0")}</p>
               <h2 id="book-question" ref={heading} tabIndex={-1} className="mt-2 text-2xl outline-none sm:text-3xl">
-                {step === 2 && kindName ? `How Many ${kindName}?` : p.steps[step]}
+                {step === 1 && single && kindName ? p.howMany(kindName) : p.steps[step]}
               </h2>
               <div className="mt-6">
                 {step === 0 && (
@@ -464,7 +467,7 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
                   </div>
                 )}
 
-                {step === 1 && category && (
+                {step === 1 && category && !single && (
                   <div className="flex flex-wrap gap-2">
                     {category.types.map((t) => (
                       <button key={t} type="button" aria-pressed={kindState === t} onClick={() => pickKind(t)} className={`h-12 px-5 text-base ${tile(kindState === t)}`}>
@@ -475,15 +478,18 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
                 )}
                 {step === 1 && !category && <p className="text-lg text-muted">{p.pickFirst}</p>}
 
-                {step === 2 && (
-                  <>
-                    <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
+                {/* How Many?, on the same question once a kind is picked (or straight away for a
+                    category with only one kind): 1, 2, 3, or More for a box up to 20. */}
+                {step === 1 && category && kind && (
+                  <div className={single ? "" : "mt-10"}>
+                    {!single && <h3 className="text-xl sm:text-2xl">{p.howMany(kindName)}</h3>}
+                    <div className={`flex flex-wrap gap-2 ${single ? "" : "mt-4"}`}>
                       {COUNTS.map((n) => (
-                        <button key={n} type="button" aria-pressed={count === n} onClick={() => pickCount(n)} className={`h-12 min-w-12 px-4 text-base tabular-nums ${tile(count === n)} justify-center text-center`}>
+                        <button key={n} type="button" aria-pressed={count === n} onClick={() => pickCount(n)} className={`h-12 min-w-14 px-4 text-base tabular-nums ${tile(count === n)} justify-center text-center`}>
                           {n}
                         </button>
                       ))}
-                      <button type="button" aria-pressed={showMore} onClick={() => setShowMore(true)} className={`col-span-5 h-12 px-5 text-base sm:col-span-1 ${tile(showMore || (count ?? 0) > 10)}`}>
+                      <button type="button" aria-pressed={showMore} onClick={() => setShowMore(true)} className={`h-12 px-5 text-base ${tile(showMore || (count ?? 0) > COUNTS.length)}`}>
                         {p.more}
                       </button>
                     </div>
@@ -491,53 +497,68 @@ function Questions({ audience, forced, contact, presetCategory }: { audience: Au
                       <div className="mt-5 flex max-w-sm gap-2">
                         <input
                           type="number"
-                          min={11}
+                          min={COUNTS.length + 1}
                           max={20}
                           value={more}
                           onChange={(e) => setMore(e.target.value)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
-                              pickCount(Number(more) || 11);
+                              pickCount(Number(more) || COUNTS.length + 1);
                             }
                           }}
-                          placeholder="11 to 20"
+                          placeholder={`${COUNTS.length + 1} to 20`}
                           aria-label={`How many ${kindName}, up to 20`}
                           autoFocus
                           className={`${input} mt-0`}
                         />
-                        <button type="button" onClick={() => pickCount(Number(more) || 11)} className={primaryButton}>
+                        <button type="button" onClick={() => pickCount(Number(more) || COUNTS.length + 1)} className={primaryButton}>
                           {p.continue}
                         </button>
                       </div>
                     )}
-                  </>
+                  </div>
                 )}
 
-                {step === 3 && (
+                {step === LAST && (
                   <>
-                    <VenueField
-                      label={p.fields.venue}
-                      placeholder={p.venuePlaceholder}
-                      value={form.venue}
-                      // Picking a suggestion can be undone; typing is kept as it goes.
-                      onChange={(venue) => (venue.placeId && venue.placeId !== form.venue.placeId ? change({ venue }) : setForm((f) => ({ ...f, venue })))}
-                      inputClass={input}
-                      testNote={!backendEnabled}
-                    />
-                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                      <label className="text-sm text-muted">
+                    {/* Date, start time, how many hours, then where (on request, 2026-11-20).
+                        Phones: the date across the width, start time and hours side by side under
+                        it; from 640px all three in one row of equal columns. */}
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                      <label className="col-span-2 min-w-0 text-sm text-muted sm:col-span-1">
                         {p.fields.date}
-                        <input type="date" min={minDate || undefined} value={form.date} onChange={(e) => change({ date: e.target.value })} className={input} />
+                        <input
+                          type="date"
+                          min={minDate || undefined}
+                          value={form.date}
+                          onChange={(e) => change({ date: e.target.value })}
+                          className={`${input} block min-w-0 appearance-none text-left [&::-webkit-date-and-time-value]:text-left`}
+                        />
                       </label>
-                      <TimeField label={p.fields.time} value={form.time} onChange={(time) => time !== form.time && change({ time })} />
-                      <DurationField label={p.fields.hours} value={form.hours} onChange={(hours) => hours !== form.hours && change({ hours })} />
+                      <div className="min-w-0">
+                        <TimeField label={p.fields.time} value={form.time} onChange={(time) => time !== form.time && change({ time })} />
+                      </div>
+                      <div className="min-w-0">
+                        <DurationField label={p.fields.hours} value={form.hours} onChange={(hours) => hours !== form.hours && change({ hours })} align="right" />
+                      </div>
                     </div>
                     {form.time && form.hours > 0 && (
                       <p className="mt-4 text-base text-ink" aria-live="polite">
                         {timeRange(form.time, endTime)}
                       </p>
                     )}
+                    <div className="mt-6">
+                      <VenueField
+                        label={p.fields.venue}
+                        placeholder={p.venuePlaceholder}
+                        value={form.venue}
+                        // Picking a suggestion can be undone; typing is kept as it goes.
+                        onChange={(venue) => (venue.placeId && venue.placeId !== form.venue.placeId ? change({ venue }) : setForm((f) => ({ ...f, venue })))}
+                        inputClass={input}
+                        testNote={!backendEnabled}
+                      />
+                    </div>
                     <label className="mt-4 block text-sm text-muted">
                       {p.fields.details}
                       <textarea value={form.details} onChange={set("details")} rows={3} placeholder={p.detailsPlaceholder} className={`${input} h-auto py-3 placeholder:text-muted/70`} />

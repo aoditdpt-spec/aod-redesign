@@ -10,7 +10,9 @@ export const bookPage = {
   title: "Get Your Artist.",
   meta: "Tell AOD who you need, when and where, and get a verified artist for your event.",
   // The questions, one at a time; each pick moves on by itself (no Next button).
-  steps: ["Who Are You Looking For?", "Which Kind Of Artist?", "How Many?", "When, Where And Your Details"],
+  // Which kind and how many share question 02 (on request, 2026-11-20).
+  steps: ["Who Are You Looking For?", "Which Kind Of Artist?", "When, Where And Your Details"],
+  howMany: (name: string) => `How Many ${name}?`,
   question: (n: number, of: number) => `Question ${n} of ${of}`,
   pickFirst: "Pick who you're looking for first.",
   more: "More",

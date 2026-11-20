@@ -8,7 +8,7 @@ import { BookForm } from "@/components/book/BookForm";
 import { Container } from "@/components/ui/Container";
 import { Dots } from "@/components/ui/Dots";
 import { primaryButton, secondaryButton } from "@/components/ui/buttons";
-import { MonthAgenda, MonthGrid, MonthSwitch } from "@/components/dash/MonthGrid";
+import { MonthGrid, MonthSwitch } from "@/components/dash/MonthGrid";
 import { ArtistCards, EventRows, Payments, Timeline, bookAgain } from "@/components/bookings/OrderParts";
 
 // aod.co.in/business, as on the main site: signed out, the page's introduction (rendered on the
@@ -198,6 +198,7 @@ function BusinessApp({ company }: { company: Company }) {
   const db = useDb();
   const [tab, setTab] = useState<Tab>("calendar");
   const [open, setOpen] = useState<string | null>(null);
+  const [bookDate, setBookDate] = useState<string | undefined>(undefined); // a day picked on the calendar
   const orders = db ? ordersOf(db, company) : [];
 
   return (
@@ -224,6 +225,7 @@ function BusinessApp({ company }: { company: Company }) {
             onClick={() => {
               setTab(t.id);
               setOpen(null);
+              setBookDate(undefined);
             }}
             className={`-mb-px shrink-0 border-b-2 pb-3 transition-colors ${tab === t.id ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
           >
@@ -236,7 +238,7 @@ function BusinessApp({ company }: { company: Company }) {
         {!db ? (
           <p className="text-muted">Loading…</p>
         ) : tab === "book" ? (
-          <BookForm forceAudience="business" contact={{ name: company.contactName, phone: company.phone, email: company.email }} />
+          <BookForm key={bookDate ?? "any"} forceAudience="business" presetDate={bookDate} contact={{ name: company.contactName, phone: company.phone, email: company.email }} />
         ) : tab === "company" ? (
           <CompanyDetails key={company.email} company={company} />
         ) : open && orders.find((o) => o.b.id === open) ? (
@@ -250,7 +252,15 @@ function BusinessApp({ company }: { company: Company }) {
             }}
           />
         ) : tab === "calendar" ? (
-          <CompanyCalendar db={db} orders={orders} onOpen={setOpen} />
+          <CompanyCalendar
+            db={db}
+            orders={orders}
+            onOpen={setOpen}
+            onBook={(day) => {
+              setBookDate(day);
+              setTab("book");
+            }}
+          />
         ) : (
           <OrderList orders={orders} onOpen={setOpen} />
         )}
@@ -262,12 +272,23 @@ function BusinessApp({ company }: { company: Company }) {
 
 type Order = { b: Booking; sample: boolean };
 
-function CompanyCalendar({ db, orders, onOpen }: { db: Db; orders: Order[]; onOpen: (id: string) => void }) {
+// The calendar, Google Calendar style: a month of days, each order a dot (phones: a small month
+// with dots under the day numbers; from 640px a full grid with each order's name). Tapping a day
+// picks it and lists its orders under the month; a day from tomorrow on can be booked straight
+// from there ("Book Artists For 24 Nov", opening Book Artists with that date filled in), and on
+// laptops a "Book" link shows on a day as the pointer passes over it (on request, 2026-11-20).
+function CompanyCalendar({ db, orders, onOpen, onBook }: { db: Db; orders: Order[]; onOpen: (id: string) => void; onBook: (day: string) => void }) {
   const [month, setMonth] = useState(() => new Date(db.today.getFullYear(), db.today.getMonth(), 1));
+  const [picked, setPicked] = useState(db.todayKey);
+  const on = (k: string) => orders.filter((o) => o.b.date === k);
+  const canBook = (k: string) => k > db.todayKey;
+  const dayOrders = on(picked);
+  const pickedDate = new Date(`${picked}T00:00:00`);
+
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-5 text-sm text-muted">
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
           {(["inquired", "assigned", "done"] as BizStage[]).map((s) => (
             <span key={s} className="flex items-center gap-2">
               <i className={`h-2 w-2 rounded-full ${stageDot[s]}`} />
@@ -277,49 +298,120 @@ function CompanyCalendar({ db, orders, onOpen }: { db: Db; orders: Order[]; onOp
         </div>
         <MonthSwitch month={month} onChange={setMonth} />
       </div>
-      {/* Phones: the month as a list of the days with orders. */}
+
+      {/* Phones: the small month, dots under the days with orders. */}
       <div className="mt-6 sm:hidden">
-        <MonthAgenda
+        <MonthGrid
           month={month}
-          today={db.todayKey}
-          empty="No orders this month."
-          day={(k) =>
-            orders
-              .filter((o) => o.b.date === k)
-              .map((o) => (
-                <button key={o.b.id} type="button" onClick={() => onOpen(o.b.id)} className="block w-full text-left">
-                  {o.b.needs}
-                  <span className="flex items-center gap-1.5 text-xs text-muted">
-                    <i className={`h-1.5 w-1.5 rounded-full ${stageDot[stageOf(o.b)]}`} />
-                    {stageText[stageOf(o.b)]} · {o.b.city}
-                  </span>
-                </button>
-              ))
-          }
+          compact
+          cell={(k, d) => {
+            const list = on(k);
+            const isPicked = k === picked;
+            return (
+              <button
+                type="button"
+                onClick={() => setPicked(k)}
+                aria-pressed={isPicked}
+                aria-label={`${shortDate(k)}, ${list.length} order${list.length === 1 ? "" : "s"}`}
+                className="flex h-12 w-full flex-col items-center justify-start pt-1"
+              >
+                <span className={`grid h-8 w-8 place-items-center rounded-full text-[15px] tabular-nums transition-colors ${isPicked ? "bg-ink text-paper" : k === db.todayKey ? "bg-brand text-white" : "text-ink"}`}>{d}</span>
+                <span className="mt-0.5 flex h-1.5 gap-0.5">
+                  {list.slice(0, 3).map((o) => (
+                    <i key={o.b.id} className={`h-1.5 w-1.5 rounded-full ${stageDot[stageOf(o.b)]}`} />
+                  ))}
+                </span>
+              </button>
+            );
+          }}
         />
       </div>
-      <div className="mt-6 hidden overflow-x-auto sm:block">
-        <div className="min-w-[640px]">
-          <MonthGrid
-            month={month}
-            cell={(k, d) => (
-              <>
-                <span className={`inline-grid h-6 w-6 place-items-center rounded-full text-xs ${k === db.todayKey ? "bg-brand text-white" : "text-muted"}`}>{d}</span>
-                <div className="mt-1 space-y-1">
-                  {orders
-                    .filter((o) => o.b.date === k)
-                    .map((o) => (
-                      <button key={o.b.id} type="button" onClick={() => onOpen(o.b.id)} className="flex w-full items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs hover:bg-wash">
-                        <i className={`h-1.5 w-1.5 shrink-0 rounded-full ${stageDot[stageOf(o.b)]}`} />
-                        <span className="truncate">{o.b.needs}</span>
-                      </button>
-                    ))}
-                </div>
-              </>
-            )}
-          />
-        </div>
+
+      {/* From 640px: the full month, each order by name. */}
+      <div className="mt-6 hidden sm:block">
+        <MonthGrid
+          month={month}
+          cell={(k, d) => (
+            <div onClick={() => setPicked(k)} className={`group -m-1.5 min-h-24 cursor-pointer p-1.5 transition-colors ${k === picked ? "bg-wash" : "hover:bg-wash/60"}`}>
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setPicked(k)}
+                  aria-pressed={k === picked}
+                  aria-label={shortDate(k)}
+                  className={`grid h-7 w-7 place-items-center rounded-full text-xs tabular-nums ${k === db.todayKey ? "bg-brand text-white" : k === picked ? "bg-ink text-paper" : "text-muted"}`}
+                >
+                  {d}
+                </button>
+                {canBook(k) && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onBook(k);
+                    }}
+                    aria-label={`Book artists for ${shortDate(k)}`}
+                    className="rounded px-1.5 py-0.5 text-xs font-medium text-brand opacity-0 transition-opacity hover:bg-paper focus:opacity-100 group-hover:opacity-100"
+                  >
+                    Book
+                  </button>
+                )}
+              </div>
+              <div className="mt-1 space-y-1">
+                {on(k).map((o) => (
+                  <button
+                    key={o.b.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpen(o.b.id);
+                    }}
+                    className="flex w-full items-center gap-1.5 truncate rounded px-1 py-0.5 text-left text-xs hover:bg-paper"
+                  >
+                    <i className={`h-1.5 w-1.5 shrink-0 rounded-full ${stageDot[stageOf(o.b)]}`} />
+                    <span className="truncate">{o.b.needs}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        />
       </div>
+
+      {/* The day picked: its orders, and booking for it. */}
+      <section aria-live="polite" className="mt-8 border-t border-ink pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h3 className="text-2xl">{pickedDate.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</h3>
+          {canBook(picked) && (
+            <button type="button" onClick={() => onBook(picked)} className={`${primaryButton} max-sm:w-full`}>
+              Book Artists For {shortDate(picked)}
+            </button>
+          )}
+        </div>
+        {dayOrders.length > 0 ? (
+          <ul className="mt-4">
+            {dayOrders.map((o) => (
+              <li key={o.b.id} className="border-b border-line">
+                <button type="button" onClick={() => onOpen(o.b.id)} className="flex w-full items-center justify-between gap-4 py-4 text-left transition-colors hover:bg-wash">
+                  <span className="min-w-0">
+                    <span className="block truncate text-lg font-medium">{o.b.needs}</span>
+                    <span className="block text-sm text-muted">
+                      {o.b.city} · {o.b.id}
+                      {o.sample && " · Sample"}
+                    </span>
+                  </span>
+                  <span className="flex shrink-0 items-center gap-2 text-sm">
+                    <i className={`h-2 w-2 rounded-full ${stageDot[stageOf(o.b)]}`} />
+                    {stageText[stageOf(o.b)]}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-muted">No orders on this day.</p>
+        )}
+      </section>
     </>
   );
 }

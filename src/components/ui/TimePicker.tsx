@@ -35,11 +35,13 @@ export function TimeField({
   value,
   onChange,
   defaultTime = "10:00",
+  align = "left",
 }: {
   label: string;
   value: string; // "" until picked
   onChange: (time: string) => void; // on OK
   defaultTime?: string; // shown on the wheels when nothing is picked yet
+  align?: "left" | "right"; // which edge of the field the wheels line up with
 }) {
   const [draft, setDraft] = useState(value || defaultTime);
   const parts = partsOf(draft);
@@ -48,6 +50,7 @@ export function TimeField({
   return (
     <PickerField
       label={label}
+      align={align}
       shown={value ? time12(value) : ""}
       onOpen={() => setDraft(value || defaultTime)}
       onOk={() => onChange(draft)}
@@ -69,11 +72,13 @@ export function DurationField({
   value,
   onChange,
   defaultMinutes = 180,
+  align = "left",
 }: {
   label: string;
   value: number; // minutes, 0 until picked
   onChange: (minutes: number) => void; // on OK
   defaultMinutes?: number; // shown on the wheels when nothing is picked yet
+  align?: "left" | "right"; // a field on the right opens its wheels leftwards, so they stay on screen
 }) {
   const [draft, setDraft] = useState(value || defaultMinutes);
   const h = Math.floor(draft / 60);
@@ -82,6 +87,7 @@ export function DurationField({
   return (
     <PickerField
       label={label}
+      align={align}
       shown={value ? durationText(value) : ""}
       onOpen={() => setDraft(value || defaultMinutes)}
       onOk={() => onChange(draft)}
@@ -95,12 +101,14 @@ export function DurationField({
 // The field and the drop-down holding the wheels, shared by TimeField and DurationField.
 function PickerField({
   label,
+  align,
   shown,
   onOpen,
   onOk,
   children,
 }: {
   label: string;
+  align: "left" | "right";
   shown: string; // the value as text, "" until picked
   onOpen: () => void;
   onOk: () => void;
@@ -171,7 +179,7 @@ function PickerField({
           ref={panel}
           role="dialog"
           aria-label={`Choose ${label.toLowerCase()}`}
-          className="absolute left-0 top-full z-30 mt-1 w-full min-w-64 max-w-80 overflow-hidden rounded-xl border border-line bg-paper text-ink shadow-xl scroll-mb-4 max-lg:scroll-mb-[calc(var(--bottom-bar)+1rem)]"
+          className={`absolute ${align === "right" ? "right-0" : "left-0"} top-full z-30 mt-1 w-full min-w-64 max-w-80 overflow-hidden rounded-xl border border-line bg-paper text-ink shadow-xl scroll-mb-4 max-lg:scroll-mb-[calc(var(--bottom-bar)+1rem)]`}
         >
           <div className="relative flex justify-center gap-2 px-4 pt-3" style={{ height: ITEM * ROWS + 12 }}>
             {/* The grey band across the middle row: the value picked. */}

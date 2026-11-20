@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { categories } from "@/data/site";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Container } from "@/components/ui/Container";
+import { Dots } from "@/components/ui/Dots";
 import { BookForm } from "@/components/book/BookForm";
 
 // One page per category, all built ahead of time (an unknown slug shows the 404).
@@ -44,7 +45,9 @@ async function Category({ params }: { params: PageProps<"/categories/[slug]">["p
       {/* The booking questions with this category already picked, as on aod.co.in. */}
       <Container className="pb-24 lg:pb-32">
         <section id="book" className="scroll-mt-24 border-t border-line pt-10">
-          <h2 className="text-3xl sm:text-4xl">Book {c.name}</h2>
+          <h2 className="text-3xl sm:text-4xl">
+            <Dots>{`Book ${c.name}.`}</Dots>
+          </h2>
           <div className="mt-8">
             <BookForm presetCategory={c.slug} />
           </div>

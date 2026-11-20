@@ -13,10 +13,11 @@ const SETTLE = 400; // ms the scramble takes to settle on the new word
 // renders the first word; under "reduce motion" the words simply swap. Once settled, a word gets
 // the logo's orange dots like the rest of the heading. With a `lead` ("Book"), a line above the
 // word reads "Book a" or "Book an" (small a, on request), the article following the word (an
-// Anchor, a Host).
+// Anchor, a Host). With `stop`, an orange full stop follows every word ("Book a Photographer.",
+// on request 2026-11-20); it sits outside the scrambling letters, so it never flickers.
 const article = (word: string) => (/^[aeiou]/i.test(word) ? "an" : "a");
 
-export function ScrambleWord({ words, lead, className = "" }: { words: string[]; lead?: string; className?: string }) {
+export function ScrambleWord({ words, lead, stop = false, className = "" }: { words: string[]; lead?: string; stop?: boolean; className?: string }) {
   const el = useRef<HTMLSpanElement>(null);
   const leadEl = useRef<HTMLSpanElement>(null);
 
@@ -79,8 +80,11 @@ export function ScrambleWord({ words, lead, className = "" }: { words: string[];
           {`${lead} ${article(words[0])}`}
         </span>
       )}
-      <span ref={el} aria-hidden className={className}>
-        <Dots>{words[0]}</Dots>
+      <span aria-hidden className={className}>
+        <span ref={el}>
+          <Dots>{words[0]}</Dots>
+        </span>
+        {stop && <span className="dot-stop">.</span>}
       </span>
     </>
   );
