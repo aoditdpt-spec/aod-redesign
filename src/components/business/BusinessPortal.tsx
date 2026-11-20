@@ -351,7 +351,7 @@ function CompanyCalendar({ db, orders, onOpen, onBook }: { db: Db; orders: Order
                       onBook(k);
                     }}
                     aria-label={`Book artists for ${shortDate(k)}`}
-                    className="rounded px-1.5 py-0.5 text-xs font-medium text-brand opacity-0 transition-opacity hover:bg-paper focus:opacity-100 group-hover:opacity-100"
+                    className="h-8 rounded-full bg-brand px-3.5 text-sm font-semibold text-white opacity-0 transition-opacity hover:bg-ink focus:opacity-100 group-hover:opacity-100"
                   >
                     Book
                   </button>

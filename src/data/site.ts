@@ -236,7 +236,7 @@ export type NavLink = { href: string; label: string };
 export const navLinks: NavLink[] = [
   { href: "/business", label: "For Business" },
   { href: "/artists", label: "For Artists" },
-  { href: "/dispute-desk", label: "Dispute Desk" },
+  { href: "/portfolio", label: "Portfolio" }, // in the navbar only, in place of the Dispute Desk (2026-11-20; the Dispute Desk stays everywhere else)
   { href: "/about", label: "About Us" },
 ];
 

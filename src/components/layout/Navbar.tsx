@@ -14,7 +14,7 @@ import { startTyping } from "@/lib/typing";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 // The top bar on every page, full width with the logo at the far left.
-// Laptops (1024px and up): logo, For Business / For Artists / Dispute Desk / About Us with a soft
+// Laptops (1024px and up): logo, For Business / For Artists / Portfolio / About Us with a soft
 // pill that glides to whichever one the pointer is on, then the search bar, My Bookings and
 // Get Your Artist at the far right. Phones and tablets: logo, then apple.com's search and menu
 // buttons at the right (the menu opens full screen); My Bookings and Get Your Artist are in the
