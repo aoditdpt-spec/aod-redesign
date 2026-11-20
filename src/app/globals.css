@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
+/* The theme (light only): black and white, with AOD orange only for the main action and the
+   logo's dot, as in the design test. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #ffffff;
+  --ink: #0a0a0a;
+  --muted: #6b6b6b;
+  /* The light borders (cards, fields, dividers); darkened from #e6e6e6 on request. */
+  --line: #c4c4c4;
+  --wash: #f5f5f5;
+  --glass: rgb(255 255 255 / 0.86);
+  --brand: #ff6201;
+  --brand-hover: #e05601;
+  /* Height of the phones' bottom bar (BottomBar.tsx): its line, padding and 44px buttons. */
+  --bottom-bar: calc(57px + max(0.75rem, env(safe-area-inset-bottom)));
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-wash: var(--wash);
+  --color-glass: var(--glass);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --container-page: 75rem; /* 1200px */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* In the base layer, so any utility class on an element (such as the search box's
+   `focus-visible:outline-none`) wins over these. */
+@layer base {
+  /* Keeps the scrollbar's space when search or the menu locks the page, so nothing jumps. */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+  }
+
+  /* Keyboard focus: a quiet black ring (no orange outlines). */
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* The logo's orange dot in big headings (Dots.tsx, src/lib/dots.ts): full stops only. */
+.dot-stop {
+  color: var(--brand);
+}
+
+/* The logo strip (BrandStrip.tsx): the list twice in a row, sliding left by one list's width and
+   starting again, so it never ends. Under reduced motion it stands still (see below). */
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee {
+  animation: marquee var(--marquee-time, 40s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee {
+    animation: none !important;
+  }
 }
