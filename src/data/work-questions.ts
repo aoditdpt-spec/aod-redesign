@@ -62,8 +62,8 @@ export const workQuestions: Record<string, WorkQuestion[]> = {
     ...brands,
   ],
   "makeup-styling": [
-    level("Makeup Artist Or Hair Stylist"),
-    { id: "specialisations", label: "Services You Offer", kind: "many", options: ["Bridal Makeup", "Party Makeup", "HD / Airbrush", "Hairstyling", "Saree Draping", "Nail Art", "Groom Makeup"] },
+    level("Makeup Artist"),
+    { id: "specialisations", label: "Services You Offer", kind: "many", options: ["Bridal Makeup", "Party Makeup", "HD / Airbrush", "Saree Draping", "Nail Art", "Groom Makeup"] },
     { id: "products", label: "Brands You Use", kind: "text", hint: "MAC, Huda Beauty, Bobbi Brown…" },
     { id: "kit", label: "Do You Bring Your Own Kit?", kind: "one", options: yesNo },
     travel,

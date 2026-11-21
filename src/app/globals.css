@@ -38,6 +38,15 @@
     scrollbar-gutter: stable;
   }
 
+  /* The homepage ignores zooming (NoZoom.tsx, on request 2026-11-21). From 1536px wide the root
+     size grows with the window (16px at 1536, 20px at 1920), and everything in rem grows with it,
+     so zooming out or a browser set to 80% shows the same page, filling the width. No pinch
+     either. Other pages zoom as normal. */
+  :root:has(main[data-no-zoom]) {
+    font-size: max(100%, 1.04167vw); /* 100vw / 96 */
+    touch-action: pan-x pan-y;
+  }
+
   body {
     background: var(--paper);
     color: var(--ink);

@@ -142,7 +142,7 @@ export async function createBookingRequest(input: BookingInput): Promise<SaveRes
     if (!ref) throw new Error("Couldn't get a free order number.");
 
     after(async () => {
-      const summary = [`Ref: ${ref}`, `Looking for: ${wanted}`, `Date: ${date}`, `Time: ${when}`, `Venue: ${venue}`, details && `Anything else:\n${details}`]
+      const summary = [`Ref: ${ref}`, `Looking for: ${wanted}`, `Date: ${date}`, `Time: ${when}`, `Venue: ${venue}`, details && `Brief for an artist:\n${details}`]
         .filter(Boolean)
         .join("\n");
       // "All orders" only: the sheet's category tabs are named after the live site's categories.
@@ -186,7 +186,7 @@ export async function createBookingRequest(input: BookingInput): Promise<SaveRes
             `Date: ${date}`,
             `Time: ${when}`,
             `Venue: ${venue}`,
-            `Anything else: ${details || "—"}`,
+            `Brief for an artist: ${details || "—"}`,
             "",
             `Customer: ${name}`,
             `Phone: ${phone}`,

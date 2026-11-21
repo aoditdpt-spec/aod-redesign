@@ -5,21 +5,23 @@ import { usePathname, useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { audiencePrompt as p } from "@/data/pages";
-import { setAudience, useAudience } from "@/lib/audience";
+import { dismissAudiencePrompt, setAudience, useAudience, useAudiencePromptDismissed } from "@/lib/audience";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 // The first visit's question: "What Are You Booking For?", Personal Events or Business Events.
 // It shows once per browser; the answer is kept (src/lib/audience.ts) until the visitor clears
-// their browsing data, or presses "Change" on the booking page. It needs an answer (the booking
-// flow depends on it), so it has no close button; the page behind can't scroll while it's open.
+// their browsing data, or presses "Change" on the booking page. The ✕ at the top right (or Escape)
+// closes it without an answer for the rest of this visit (dismissAudiencePrompt); the booking form
+// then books as personal events. The page behind can't scroll while it's open.
 // A sheet from the bottom on phones, a card in the middle from 640px.
 export function AudiencePrompt() {
   const audience = useAudience();
   const router = useRouter();
   // Not on the artists' pages (For Artists, apply, sign-in): they've come to join, not to book.
   const forArtists = usePathname().startsWith("/artists");
-  const open = audience === null && !forArtists;
+  const dismissed = useAudiencePromptDismissed();
+  const open = audience === null && !forArtists && !dismissed;
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -29,9 +31,12 @@ export function AudiencePrompt() {
     // Focus goes to the card itself, not the first button: a focused button gets the black focus
     // ring, which looked like Personal Events was already picked. Tab still reaches both buttons.
     const t = window.setTimeout(() => box.current?.focus(), 50);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && dismissAudiencePrompt();
+    window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = before;
       window.clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
     };
   }, [open]);
 
@@ -56,9 +61,19 @@ export function AudiencePrompt() {
             initial={{ y: 40, opacity: 0 }}
             animate={{ y: 0, opacity: 1, transition: { duration: 0.45, ease } }}
             exit={{ y: 24, opacity: 0, transition: { duration: 0.2 } }}
-            className="w-full rounded-t-2xl bg-paper px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-7 sm:max-w-xl sm:rounded-2xl sm:p-10 outline-none"
+            className="relative w-full rounded-t-2xl bg-paper px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-7 sm:max-w-xl sm:rounded-2xl sm:p-10 outline-none"
           >
-            <h2 id="audience-title" className="text-3xl sm:text-4xl">
+            <button
+              type="button"
+              onClick={dismissAudiencePrompt}
+              aria-label={p.close}
+              className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full text-muted transition-colors hover:bg-wash hover:text-ink sm:right-4 sm:top-4"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" aria-hidden className="h-5 w-5">
+                <path d="M6 6l12 12M18 6L6 18" />
+              </svg>
+            </button>
+            <h2 id="audience-title" className="pr-10 text-3xl sm:text-4xl">
               {p.title}
             </h2>
             <div className="mt-6 grid gap-3 sm:mt-8 sm:grid-cols-2">

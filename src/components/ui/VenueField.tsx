@@ -43,7 +43,7 @@ function loadPlaces(): Promise<PlacesLib | null> {
 // Gujarat, roughly: suggestions lean towards it (and stay in India) without hiding the rest.
 const bias = { center: { lat: 22.7, lng: 71.6 }, radius: 50000 };
 
-export function VenueField({ label, placeholder, value, onChange, inputClass, testNote }: { label: string; placeholder: string; value: Venue; onChange: (v: Venue) => void; inputClass: string; testNote: boolean }) {
+export function VenueField({ label, hideLabel = false, placeholder, value, onChange, inputClass, testNote }: { label: string; hideLabel?: boolean; placeholder: string; value: Venue; onChange: (v: Venue) => void; inputClass: string; testNote: boolean }) {
   const [lib, setLib] = useState<PlacesLib | null>(null);
   const [list, setList] = useState<Prediction[]>([]);
   const [open, setOpen] = useState(false);
@@ -97,7 +97,7 @@ export function VenueField({ label, placeholder, value, onChange, inputClass, te
   return (
     <div className="relative">
       <label className="block text-sm text-muted">
-        {label}
+        <span className={hideLabel ? "sr-only" : undefined}>{label}</span>
         <input
           value={value.text}
           onChange={(e) => {

@@ -33,12 +33,13 @@ export const heroMosaic: ({ kind: "text"; value: string; label: string } | { kin
 // the style of Urban Company's category icons (2026-11-19): people at work, on white (the cards
 // blend the white away). Stand-Up Comedians is the owner's comedian with a mic (2026-11-20).
 export const categoryIcons: Record<string, string> = {
-  "photo-video": "/categories/icons/portrait-photographer.png",
-  "anchors-hosts": "/categories/icons/portrait-anchor.png",
-  "musicians-djs": "/categories/icons/portrait-musician.png",
-  comedians: "/categories/icons/portrait-comedian.png",
-  "models-creators": "/categories/icons/portrait-model.png",
-  "makeup-styling": "/categories/icons/portrait-makeup-brush.png",
+  // Transparent cut-outs (2026-11-21), 512px squares, each person standing on the bottom edge.
+  "photo-video": "/categories/icons/cutout-photographer.png",
+  "anchors-hosts": "/categories/icons/cutout-anchor.png",
+  "musicians-djs": "/categories/icons/cutout-musician.png",
+  comedians: "/categories/icons/cutout-comedian.png",
+  "models-creators": "/categories/icons/cutout-model.png",
+  "makeup-styling": "/categories/icons/cutout-makeup.png",
 };
 
 export const categoriesSection = {

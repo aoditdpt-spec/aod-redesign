@@ -1,14 +1,16 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { audiencePrompt as ap, bookPage as p } from "@/data/pages";
+import { categoryIcons } from "@/data/home";
 import { categories } from "@/data/site";
 import { setAudience, useAudience, type Audience } from "@/lib/audience";
 import { backendEnabled } from "@/lib/backend";
-import { endAfter, timeRange } from "@/lib/event-time";
+import { durationText, endAfter, time12, timeRange } from "@/lib/event-time";
 import { orderId } from "@/lib/order-id";
 import { takeRebook } from "@/lib/rebook";
 import { requestCode, signedInEmail, verifyCode } from "@/server/actions/auth";
@@ -21,14 +23,15 @@ import { VenueField, blankVenue, type Venue } from "@/components/ui/VenueField";
 
 // The booking request, with as few clicks as possible (on request, 2026-11-19): each pick moves on
 // by itself, with no Next button.
-//   01 Who Are You Looking For?  tap one category
+//   01 Who Are You Looking For?  tap one category (each with the homepage's picture)
 //   02 Which Kind Of Artist?     tap one kind, then How Many? below it on the same question: 1, 2, 3
 //                                or More (a box for 4 to 20); nothing picked to start with. A category
 //                                with only one kind asks How Many? alone. Tapping a number moves on.
-//   03 When, Where And Your Details   date, start time, how many hours, where, anything else, then
+//   03 When, Where And Your Details   date, start time, how many hours, where, the brief for an artist, then
 //                                name, phone and email; Send OTP, then Confirm
 //      Request saves it straight away (no review page) and says "Request Received." with the ref.
-// The answers so far show as chips that jump back; Back, Undo and Clear All sit by the progress.
+// The answers so far show as chips that jump back; Back and Clear All sit by the progress (Undo
+// removed on request, 2026-11-21).
 // Business events are booked from the company's account (/business), as on aod.co.in: there the
 // portal's Book Artists tab shows these questions with `forceAudience="business"` and the company's
 // contact details filled in; anywhere else a visitor who chose Business Events goes to /business
@@ -72,14 +75,40 @@ function saveMock(order: Record<string, unknown>) {
 
 const isEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 const input = "mt-2 h-12 w-full rounded-lg border border-line bg-paper px-4 text-base text-ink outline-none transition-colors focus:border-ink";
-const tile = (on: boolean) => `rounded-xl border text-left font-medium leading-tight transition-colors ${on ? "border-ink bg-ink text-paper" : "border-line bg-paper text-ink hover:border-ink"}`;
+const tile = (on: boolean) => `rounded-xl border font-medium leading-tight transition-colors ${on ? "border-ink bg-ink text-paper" : "border-line bg-paper text-ink hover:border-ink"}`;
 const textButton = "text-sm font-medium text-ink underline underline-offset-4 hover:text-brand disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40";
 const blank = { date: "", time: "", hours: 0, venue: blankVenue as Venue, details: "", name: "", phone: "", email: "" };
 const LAST = p.steps.length - 1;
 const COUNTS = [1, 2, 3]; // then More, a box for 4 to 20
+// The last question's quick picks; "Other" opens the scroll wheels (TimePicker.tsx).
+const TIMES = ["10:00", "12:00", "15:00", "17:00", "19:00", "20:00"];
+const HOURS = [2, 3, 4, 5, 6, 8];
+const DAYS = 15; // day tiles from tomorrow; "Other" opens the calendar for any later day
+const sectionTitle = "text-xl font-medium sm:text-2xl";
+const subLabel = "text-sm text-muted";
+
+// A YYYY-MM-DD day as the tiles show it.
+function dayParts(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  return {
+    value,
+    weekday: date.toLocaleDateString("en-IN", { weekday: "short" }),
+    day: String(d),
+    month: date.toLocaleDateString("en-IN", { month: "short" }),
+    long: date.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" }),
+  };
+}
+function nextDays(from: string, n: number) {
+  if (!from) return [];
+  const [y, m, d] = from.split("-").map(Number);
+  return Array.from({ length: n }, (_, i) => {
+    const t = new Date(y, m - 1, d + i);
+    return dayParts(`${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`);
+  });
+}
 
 type Contact = { name: string; phone: string; email: string };
-type Snapshot = { step: number; cat: string | null; kind: string | null; count: number | null; form: typeof blank };
 
 export function BookForm({ forceAudience, contact, presetCategory, presetDate }: { forceAudience?: Audience; contact?: Contact; presetCategory?: string; presetDate?: string }) {
   const chosenAudience = useAudience();
@@ -120,8 +149,9 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   const [count, setCount] = useState<number | null>(null); // nothing picked to start with
   const [more, setMore] = useState("");
   const [showMore, setShowMore] = useState(false);
+  const [otherTime, setOtherTime] = useState(false);
+  const [otherHours, setOtherHours] = useState(false);
   const [form, setForm] = useState(() => ({ ...blank, date: presetDate ?? "", ...contact }));
-  const [history, setHistory] = useState<Snapshot[]>([]);
   const [missing, setMissing] = useState<string[]>([]);
   const [view, setView] = useState<"form" | "done">("form");
   const [ref, setRef] = useState("");
@@ -141,6 +171,11 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   const confirmed = verified === email;
   const codeSent = !confirmed && codeFor === email;
   const endTime = endAfter(form.time, form.hours);
+  const days = nextDays(minDate, DAYS);
+  const pickedDay = form.date ? dayParts(form.date) : null;
+  const otherDate = Boolean(form.date) && !days.some((d) => d.value === form.date);
+  const timeIsOther = otherTime || (Boolean(form.time) && !TIMES.includes(form.time));
+  const hoursIsOther = otherHours || (form.hours > 0 && !HOURS.some((h) => h * 60 === form.hours));
   const kindName = kind ?? category?.name ?? "";
   const needsText = kindName ? withCount(kindName, count ?? 1) : "";
 
@@ -182,19 +217,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     setDir(to >= step ? 1 : -1);
     setStep(to);
   };
-  const remember = () => setHistory((h) => [...h.slice(-49), { step, cat, kind: kindState, count, form }]);
-  function undo() {
-    const last = history.at(-1);
-    if (!last) return;
-    setHistory((h) => h.slice(0, -1));
-    setPicked(last.cat);
-    setKind(last.kind);
-    setCount(last.count);
-    setForm(last.form);
-    if (last.step !== step) goStep(last.step);
-  }
   function clearAll() {
-    remember();
     setPicked(null);
     setKind(null);
     setCount(null);
@@ -206,7 +229,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   const back = () => goStep(step - 1);
 
   const pickCategory = (slug: string) => {
-    remember();
     if (slug !== cat) {
       setKind(null);
       setCount(null);
@@ -217,7 +239,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   };
   // Picking a kind stays on question 02, where How Many? appears under the kinds.
   const pickKind = (k: string) => {
-    remember();
     if (k !== kindState) {
       setCount(null);
       setShowMore(false);
@@ -225,15 +246,11 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     setKind(k);
   };
   const pickCount = (n: number) => {
-    remember();
     setCount(Math.max(1, Math.min(20, n)));
     goStep(LAST);
   };
   const set = (key: "details" | "name" | "phone" | "email") => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setForm((f) => ({ ...f, [key]: e.target.value }));
-  const change = (patch: Partial<typeof blank>) => {
-    remember();
-    setForm((f) => ({ ...f, ...patch }));
-  };
+  const change = (patch: Partial<typeof blank>) => setForm((f) => ({ ...f, ...patch }));
 
   function stillNeeded() {
     const f = p.fields;
@@ -342,7 +359,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     setCount(null);
     setShowMore(false);
     setForm((f) => ({ ...blank, name: f.name, phone: f.phone, email: f.email }));
-    setHistory([]);
     setMissing([]);
     setSaveError(null);
     setDir(-1);
@@ -399,7 +415,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
         </p>
       )}
 
-      {/* Progress, with Back, Undo and Clear All. */}
+      {/* Progress, with Back and Clear All. */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink pt-5">
         <div className="flex items-center gap-3 text-sm text-muted">
           <span>{p.question(step + 1, p.steps.length)}</span>
@@ -415,9 +431,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
               {p.back}
             </button>
           )}
-          <button type="button" onClick={undo} disabled={!history.length} className={textButton}>
-            {p.undo}
-          </button>
           <button type="button" onClick={clearAll} disabled={!cat && JSON.stringify(form) === JSON.stringify({ ...blank, ...contact })} className={textButton}>
             {p.clear}
           </button>
@@ -460,8 +473,11 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
                 {step === 0 && (
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     {categories.map((c) => (
-                      <button key={c.slug} type="button" aria-pressed={cat === c.slug} onClick={() => pickCategory(c.slug)} className={`flex min-h-20 items-end p-4 text-base ${tile(cat === c.slug)}`}>
-                        {c.name}
+                      <button key={c.slug} type="button" aria-pressed={cat === c.slug} onClick={() => pickCategory(c.slug)} className={`flex flex-col items-start rounded-xl border p-4 text-left text-base font-medium leading-tight text-ink transition-colors ${cat === c.slug ? "border-ink bg-wash ring-1 ring-ink" : "border-line bg-paper hover:border-ink"}`}>
+                        {/* The homepage's picture for the category (categoryIcons), a transparent cut-out. A picked
+                            tile is outlined, not black, so the dark clothes stay visible. */}
+                        <Image src={categoryIcons[c.slug]} alt="" width={512} height={512} className="h-14 w-14 sm:h-16 sm:w-16" />
+                        <span className="mt-3">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -522,63 +538,128 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
 
                 {step === LAST && (
                   <>
-                    {/* Date, start time, how many hours, then where (on request, 2026-11-20).
-                        Phones: the date across the width, start time and hours side by side under
-                        it; from 640px all three in one row of equal columns. */}
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                      <label className="col-span-2 min-w-0 text-sm text-muted sm:col-span-1">
-                        {p.fields.date}
+                    {/* Tap-to-pick, like the first two questions, so it doesn't read as a form
+                        (on request, 2026-11-21): When (a day, a start time, how long; "Other"
+                        opens the calendar or the scroll wheels), Where, the brief, then the
+                        contact details in a card. */}
+                    <h3 className={sectionTitle}>{p.sections.when}</h3>
+                    <p className={`${subLabel} mt-4`}>{p.fields.date}</p>
+                    <div className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-8 sm:overflow-visible sm:px-0">
+                      {days.map((d) => (
+                        <button key={d.value} type="button" aria-pressed={form.date === d.value} aria-label={d.long} onClick={() => change({ date: d.value })} className={`flex w-[4.5rem] shrink-0 flex-col items-center py-3 text-center sm:w-auto ${tile(form.date === d.value)}`}>
+                          <span className="text-xs opacity-70">{d.weekday}</span>
+                          <span className="mt-1 text-2xl tabular-nums">{d.day}</span>
+                          <span className="text-xs opacity-70">{d.month}</span>
+                        </button>
+                      ))}
+                      {/* Any other day: the browser's own calendar, opened by a tap anywhere on the tile. */}
+                      <label className={`relative flex w-[4.5rem] shrink-0 cursor-pointer flex-col items-center justify-center py-3 text-center sm:w-auto ${tile(otherDate)}`}>
+                        <span className="text-xs opacity-70">{otherDate ? pickedDay?.weekday : p.otherDate[0]}</span>
+                        <span className={`mt-1 tabular-nums ${otherDate ? "text-2xl" : "text-base"}`}>{otherDate ? pickedDay?.day : p.otherDate[1]}</span>
+                        <span className="text-xs opacity-70">{otherDate ? pickedDay?.month : "\u00a0"}</span>
                         <input
                           type="date"
                           min={minDate || undefined}
                           value={form.date}
                           onChange={(e) => change({ date: e.target.value })}
-                          className={`${input} block min-w-0 appearance-none text-left [&::-webkit-date-and-time-value]:text-left`}
+                          onClick={(e) => {
+                            try {
+                              e.currentTarget.showPicker?.();
+                            } catch {
+                              // Older browsers open it themselves.
+                            }
+                          }}
+                          aria-label={p.fields.date}
+                          className="absolute inset-0 cursor-pointer opacity-0"
                         />
                       </label>
-                      <div className="min-w-0">
-                        <TimeField label={p.fields.time} value={form.time} onChange={(time) => time !== form.time && change({ time })} />
-                      </div>
-                      <div className="min-w-0">
-                        <DurationField label={p.fields.hours} value={form.hours} onChange={(hours) => hours !== form.hours && change({ hours })} align="right" />
-                      </div>
                     </div>
+
+                    <p className={`${subLabel} mt-8`}>{p.fields.time}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {TIMES.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          aria-pressed={form.time === t && !otherTime}
+                          onClick={() => {
+                            setOtherTime(false);
+                            change({ time: t });
+                          }}
+                          className={`h-12 px-4 text-base tabular-nums ${tile(form.time === t && !otherTime)}`}
+                        >
+                          {time12(t).replace(":00", "")}
+                        </button>
+                      ))}
+                      <button type="button" aria-pressed={timeIsOther} onClick={() => setOtherTime(true)} className={`h-12 px-5 text-base ${tile(timeIsOther)}`}>
+                        {form.time && !TIMES.includes(form.time) ? time12(form.time) : p.other}
+                      </button>
+                    </div>
+                    {timeIsOther && (
+                      <div className="mt-3 max-w-xs">
+                        <TimeField label={p.pickTime} value={form.time} onChange={(time) => change({ time })} />
+                      </div>
+                    )}
+
+                    <p className={`${subLabel} mt-8`}>{p.fields.hours}</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {HOURS.map((h) => (
+                        <button
+                          key={h}
+                          type="button"
+                          aria-pressed={form.hours === h * 60 && !otherHours}
+                          onClick={() => {
+                            setOtherHours(false);
+                            change({ hours: h * 60 });
+                          }}
+                          className={`h-12 px-4 text-base tabular-nums ${tile(form.hours === h * 60 && !otherHours)}`}
+                        >
+                          {p.hoursShort(h)}
+                        </button>
+                      ))}
+                      <button type="button" aria-pressed={hoursIsOther} onClick={() => setOtherHours(true)} className={`h-12 px-5 text-base ${tile(hoursIsOther)}`}>
+                        {form.hours > 0 && !HOURS.some((h) => h * 60 === form.hours) ? durationText(form.hours) : p.other}
+                      </button>
+                    </div>
+                    {hoursIsOther && (
+                      <div className="mt-3 max-w-xs">
+                        <DurationField label={p.pickHours} value={form.hours} onChange={(hours) => change({ hours })} />
+                      </div>
+                    )}
+
+                    {/* The answer in one line, once there's a start time and a length. */}
                     {form.time && form.hours > 0 && (
-                      <p className="mt-4 text-base text-ink" aria-live="polite">
+                      <p className="mt-6 rounded-xl bg-wash px-4 py-3 text-base text-ink" aria-live="polite">
+                        {pickedDay && <span className="font-medium">{pickedDay.long} · </span>}
                         {timeRange(form.time, endTime)}
                       </p>
                     )}
-                    <div className="mt-6">
-                      <VenueField
-                        label={p.fields.venue}
-                        placeholder={p.venuePlaceholder}
-                        value={form.venue}
-                        // Picking a suggestion can be undone; typing is kept as it goes.
-                        onChange={(venue) => (venue.placeId && venue.placeId !== form.venue.placeId ? change({ venue }) : setForm((f) => ({ ...f, venue })))}
-                        inputClass={input}
-                        testNote={!backendEnabled}
-                      />
-                    </div>
-                    <label className="mt-4 block text-sm text-muted">
-                      {p.fields.details}
-                      <textarea value={form.details} onChange={set("details")} rows={3} placeholder={p.detailsPlaceholder} className={`${input} h-auto py-3 placeholder:text-muted/70`} />
-                    </label>
 
-                    <h3 className="mt-10 border-t border-line pt-8 text-2xl">{p.detailsTitle}</h3>
+                    <h3 className={`${sectionTitle} mt-14`}>{p.fields.venue}</h3>
+                    <div className="mt-4">
+                      <VenueField label={p.fields.venue} hideLabel placeholder={p.venuePlaceholder} value={form.venue} onChange={(venue) => change({ venue })} inputClass={input} testNote={!backendEnabled} />
+                    </div>
+
+                    <h3 className={`${sectionTitle} mt-14`}>{p.fields.details}</h3>
+                    <textarea value={form.details} onChange={set("details")} rows={3} aria-label={p.fields.details} placeholder={p.detailsPlaceholder} className={`${input} mt-4 h-auto py-3 placeholder:text-muted/70`} />
+
                     {/* Name and phone side by side, half the width each; email on its own line. */}
-                    <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
-                      <label className="text-sm text-muted">
-                        {p.fields.name}
-                        <input value={form.name} onChange={set("name")} autoComplete="name" className={input} />
-                      </label>
-                      <label className="text-sm text-muted">
-                        {p.fields.phone}
-                        <input value={form.phone} onChange={set("phone")} inputMode="tel" autoComplete="tel" className={input} />
-                      </label>
-                      <label className="col-span-2 text-sm text-muted">
-                        {p.fields.email}
-                        <input type="email" inputMode="email" value={form.email} onChange={set("email")} autoComplete="email" className={input} />
-                      </label>
+                    <div className="mt-14 rounded-2xl bg-wash p-5 sm:p-6">
+                      <h3 className={sectionTitle}>{p.detailsTitle}</h3>
+                      <div className="mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+                        <label className="text-sm text-muted">
+                          {p.fields.name}
+                          <input value={form.name} onChange={set("name")} autoComplete="name" className={input} />
+                        </label>
+                        <label className="text-sm text-muted">
+                          {p.fields.phone}
+                          <input value={form.phone} onChange={set("phone")} inputMode="tel" autoComplete="tel" className={input} />
+                        </label>
+                        <label className="col-span-2 text-sm text-muted">
+                          {p.fields.email}
+                          <input type="email" inputMode="email" value={form.email} onChange={set("email")} autoComplete="email" className={input} />
+                        </label>
+                      </div>
                     </div>
                     {/* The spam trap: hidden, so autofill and people never reach it. */}
                     <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

@@ -42,7 +42,7 @@ export function EventRows({ b }: { b: Booking }) {
     ["Date", parseDay(b.date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })],
     ["Time", b.start ? timeRange(b.start, b.end) : ""],
     ["Venue", b.venue || b.city],
-    ["Anything Else", b.notes],
+    ["Brief For An Artist", b.notes],
     ["Brief", b.brief ?? ""],
   ];
   return (

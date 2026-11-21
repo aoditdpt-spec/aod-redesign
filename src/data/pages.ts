@@ -18,23 +18,29 @@ export const bookPage = {
   more: "More",
   continue: "Continue",
   detailsTitle: "Your Details",
+  // The last question's parts and quick picks (BookForm.tsx).
+  sections: { when: "When Is The Event?" },
+  otherDate: ["Other", "Date"],
+  other: "Other",
+  pickTime: "Pick A Time",
+  pickHours: "Pick A Length",
+  hoursShort: (h: number) => `${h} Hrs`,
   back: "Back",
-  undo: "Undo",
   clear: "Clear All",
   fields: {
     date: "Date",
     time: "Start Time",
     hours: "How Many Hours?",
     venue: "Where Is The Event?",
-    details: "Anything Else? (Optional)",
+    details: "Brief For An Artist (Optional)",
     name: "Your Name",
     phone: "Phone Number",
     email: "Email",
   },
   // The exact venue (Google Maps suggestions under the box, VenueField.tsx).
   venuePlaceholder: "Search A Hotel, Hall Or Home Address",
-  // The "Anything else?" box's placeholder: what the team usually asks next.
-  detailsPlaceholder: "Guest Count:\nBudget:",
+  // The "Brief For An Artist" box's placeholder: what the team usually asks next.
+  detailsPlaceholder: "Guest Count, Budget, Special Requirements Etc.",
   sendCode: "Send OTP",
   sending: "Sending…",
   codeTitle: "Enter The OTP",
@@ -226,4 +232,5 @@ export const audiencePrompt = {
   artistSkip: "Skip And Join As Artist",
   bookingFor: "Booking For",
   change: "Change",
+  close: "Close",
 } as const;

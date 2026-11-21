@@ -175,7 +175,7 @@ export const portfolioArtists: PortfolioArtist[] = [
     city: "Surat",
     experience: "More Than 5 Years",
     languages: ["Gujarati", "Hindi"],
-    about: "Bridal, party and on-camera makeup, with hair styling on request.",
+    about: "Bridal, party and on-camera makeup.",
     works: [
       { src: "/categories/makeup-artists.jpg", caption: "Bridal Makeup" },
       { src: "/categories/models.jpg", caption: "Editorial Look" },

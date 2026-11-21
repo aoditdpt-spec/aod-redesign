@@ -25,9 +25,8 @@ export function Categories() {
                   href={`/categories/${c.slug}`}
                   className="flex h-full flex-col rounded-xl border border-line bg-gradient-to-b from-wash to-paper p-4 transition-colors hover:border-ink sm:p-6"
                 >
-                  {/* The category's picture (categoryIcons in src/data/home.ts). It sits on white, and
-                      "multiply" lets the card's grey show through the white. */}
-                  <Image src={categoryIcons[c.slug]} alt="" width={512} height={512} className="h-16 w-16 mix-blend-multiply sm:h-24 sm:w-24" />
+                  {/* The category's picture (categoryIcons in src/data/home.ts), a transparent cut-out. */}
+                  <Image src={categoryIcons[c.slug]} alt="" width={512} height={512} className="h-16 w-16 sm:h-24 sm:w-24" />
                   <span className="mt-4 text-xl font-medium leading-tight tracking-tight text-ink sm:mt-6 sm:text-2xl">{c.name}</span>
                   <span className="mt-2 text-sm text-muted">{c.blurb}</span>
                 </Link>

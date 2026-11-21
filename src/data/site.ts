@@ -210,18 +210,17 @@ export const categories: Category[] = [
   {
     slug: "makeup-styling",
     name: "Makeup & Styling",
-    blurb: "Bridal Looks, Hair and Camera-Ready Glam for Every Event",
+    blurb: "Bridal Looks and Camera-Ready Glam for Every Event",
     image: "/categories/makeup-artists.jpg",
-    types: ["Makeup Artists", "Hair Stylists"],
-    keywords: ["makeup", "make up", "mua", "bridal", "hair", "stylist", "styling"],
+    types: ["Makeup Artists"], // one kind, so booking goes straight to How Many? (no hair stylists, 2026-11-21)
+    keywords: ["makeup", "make up", "mua", "bridal", "stylist", "styling"],
     groups: [
       {
-        title: "Makeup & Hair",
+        title: "Makeup",
         services: [
           "Bridal makeup",
           "Party makeup",
           "Editorial / shoot makeup",
-          "Hair styling",
         ],
       },
     ],
