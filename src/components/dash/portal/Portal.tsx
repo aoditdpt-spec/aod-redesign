@@ -292,8 +292,24 @@ export function Bookings() {
 
 export function Availability() {
   const db = useDb();
+  const email = usePortalEmail();
   const [month, setMonth] = useState<Date | null>(null);
   if (!db) return <Loading />;
+  // Signed in with an applicant's email (not live yet): days off only count once they're live.
+  const applicant = email ? db.applications.find((a) => a.email.toLowerCase() === email && a.stage !== "approved") : undefined;
+  if (applicant)
+    return (
+      <>
+        <PageTitle title="Availability" text="Tap a day to mark it off. AOD won't send requests for days you're off." />
+        <div className="mt-8 max-w-xl rounded-2xl border border-line p-6">
+          <p className="text-lg font-medium">Availability Opens Once You&apos;re Live On AOD.</p>
+          <p className="mt-2 text-muted">Once AOD approves your profile, mark the days you can&apos;t work here, and no requests come for them.</p>
+          <Link href="/artists/profile" className={`${btnMain} mt-5`}>
+            Complete Your Details
+          </Link>
+        </div>
+      </>
+    );
   const m = month ?? new Date(db.today.getFullYear(), db.today.getMonth(), 1);
   return (
     <>

@@ -57,7 +57,7 @@ export function AdminSignIn() {
           >
             <label className="block">
               <span className={label}>Work Email</span>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="aditi@example.com" className={field} />
+              <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" autoComplete="email" placeholder="you@aod.co.in" className={field} />
             </label>
             <button className={`${btnMain} w-full`}>Send OTP</button>
           </form>
