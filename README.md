@@ -1,36 +1,14 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# aod-redesign
 
-## Getting Started
+The design workspace for aod.co.in's new look (clean black and white, AOD orange for the main action, Instrument Sans). It runs on **mock data only**: everything is kept in the browser, nothing is emailed or saved, every field may be left empty and any code works, so each screen can be clicked straight through.
 
-First, run the development server:
+On 21 Nov 2026 this design (up to commit 333c77f) became the live site: it was moved into the `aod` repo (aod.co.in) and connected there to the real backend. Changes made here don't reach aod.co.in by themselves; they have to be carried over to `aod`.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000 (admin: /admin, artist portal: /artists/dashboard, Dispute Desk: /dispute-desk)
+npm run build
+npm run check:search
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+What's where: pages in `src/app` (`(site)` the customer site, `(portal)` the artist portal, `(desk)` the Dispute Desk, `admin`), copy and data in `src/data`, the sample "database" in `src/lib/mock-db.ts`. `WHATS-LEFT.md` lists how it differed from aod.co.in before the move. The guides for the live site are in the private `guides` folder next to this one.

@@ -18,7 +18,7 @@ export type SaveResult = { ok: true; ref: string } | { ok: false; error: string;
 
 export type BookingInput = {
   categories: string[]; // slugs, as picked
-  kinds?: string[]; // the kinds of artist picked in question 02 (Photographers, DJs…)
+  kinds?: string[]; // the kinds of artist picked in question 02 (Photographers, Live Band…)
   occasion?: string; // question 03
   brief?: string; // for the artists
   lines?: { category: string; name: string; count: number }[]; // how many of each kind (question 02, under the kinds)

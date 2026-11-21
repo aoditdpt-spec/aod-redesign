@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "AOD – Artists on Demand",
     short_name: "AOD",
-    description: "Book verified photographers, cinematographers, DJs, anchors and more in Ahmedabad.",
+    description: "Book verified photographers, cinematographers, live bands, anchors and more in Ahmedabad.",
     start_url: "/",
     scope: "/",
     display: "standalone",
