@@ -430,7 +430,6 @@ export function Portfolio() {
           </label>
         )}
       </div>
-      <p className="mt-6 text-xs text-muted">Test Mode: photos you add stay in this tab only.</p>
     </>
   );
 }

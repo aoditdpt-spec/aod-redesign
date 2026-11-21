@@ -21,7 +21,6 @@ export function NewsletterAction({ mode }: { mode: "confirm" | "unsubscribe" }) 
           {c.button}
         </button>
       )}
-      <p className="mt-6 text-sm text-muted">{p.testNote}</p>
     </div>
   );
 }

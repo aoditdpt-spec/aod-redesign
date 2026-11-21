@@ -65,6 +65,10 @@ export function useCompany(): Company | null | "unknown" {
   return useSyncExternalStore<Company | null | "unknown">(subscribe, read, () => "unknown");
 }
 
+// Whether a company account in this browser uses this email (test mode; My Bookings points such
+// an email to AOD For Business).
+export const isLocalCompanyEmail = (email: string) => accounts().some((a) => a.email.toLowerCase() === email.trim().toLowerCase());
+
 export const business = {
   // Create an account (sign up) and sign in with it.
   create: (c: Company) => save(c),

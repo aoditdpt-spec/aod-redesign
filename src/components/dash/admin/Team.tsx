@@ -28,7 +28,7 @@ export function Reports() {
 
   return (
     <>
-      <Title title="Reports And Exports" text="Sample figures in test mode." />
+      <Title title="Reports And Exports" />
       <Nums
         items={[
           { value: rupees(revenue), label: "Verified This Month" },

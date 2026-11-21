@@ -520,7 +520,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate, pres
             </Link>
           )}
         </div>
-        {!backendEnabled && <p className="mt-6 text-sm text-muted">{p.previewNote}</p>}
       </div>
     );
 
@@ -747,7 +746,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate, pres
                       {p.fields.occasion}
                       <input value={form.occasion} onChange={set("occasion")} placeholder={p.occasionPlaceholder} className={`${input} placeholder:text-muted/70`} />
                     </label>
-                    <VenueField label={p.fields.venue} hideLabel placeholder={p.venuePlaceholder} value={form.venue} onChange={(venue) => change({ venue })} inputClass={input} testNote={!backendEnabled} />
+                    <VenueField label={p.fields.venue} hideLabel placeholder={p.venuePlaceholder} value={form.venue} onChange={(venue) => change({ venue })} inputClass={input} />
                     <label className="mt-8 block text-sm text-muted">
                       {p.fields.details}
                       <textarea value={form.details} onChange={set("details")} rows={4} placeholder={p.detailsPlaceholder} className={`${input} h-auto py-3 placeholder:text-muted/70`} />
@@ -799,7 +798,6 @@ function Questions({ audience, forced, contact, presetCategory, presetDate, pres
                             {codeError}
                           </p>
                         )}
-                        {!backendEnabled && <p className="mt-3 text-sm text-muted">{p.codePreview}</p>}
                         <button type="button" onClick={sendCode} disabled={Boolean(busy)} className={`mt-3 ${textButton}`}>
                           {p.newCode}
                         </button>

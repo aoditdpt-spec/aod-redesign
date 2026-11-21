@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { act, hoursLeft, parseDay, stageLabel, useDb, type Booking, type Db } from "@/lib/mock-db";
 import { primaryButton, secondaryButton } from "@/components/ui/buttons";
+import { isLocalCompanyEmail } from "@/lib/business";
 import { ArtistCards, EventRows, Payments, Progress, Timeline, bookAgain } from "./OrderParts";
 
 // My Bookings, as on aod.co.in: sign in with the email you booked with and a 6-digit code, then
@@ -55,13 +56,32 @@ function SignIn() {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setE] = useState("");
   const [code, setCode] = useState("");
+  const [companyEmail, setCompanyEmail] = useState(false);
   return (
     <div className="max-w-md border-t border-ink pt-10">
-      {step === "email" ? (
+      {companyEmail ? (
+        // A company's email: its orders are in AOD For Business, not here (on request, 2026-11-21).
+        <div className="space-y-5" role="status">
+          <p className="text-xl font-medium">This Is A Company Email.</p>
+          <p className="text-muted">
+            <span className="text-ink">{email.trim().toLowerCase()}</span> belongs to a company account on AOD For Business. Its orders are in the business portal, not My Bookings.
+          </p>
+          <div className="flex flex-wrap gap-3 max-sm:*:flex-1">
+            <Link href="/business" className={primaryButton}>
+              Sign In To AOD For Business
+            </Link>
+            <button type="button" onClick={() => setCompanyEmail(false)} className={secondaryButton}>
+              Use Another Email
+            </button>
+          </div>
+        </div>
+      ) : step === "email" ? (
         <form
           className="space-y-6"
           onSubmit={(e) => {
             e.preventDefault();
+            // A company's email goes to AOD For Business instead.
+            if (isLocalCompanyEmail(email)) return setCompanyEmail(true);
             setStep("code");
           }}
         >
@@ -83,7 +103,6 @@ function SignIn() {
             <span className="mb-2 block text-sm text-muted">Enter The OTP</span>
             <input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" autoComplete="one-time-code" placeholder="000000" className={`${input} max-w-48 tracking-[0.3em]`} />
           </label>
-          <p className="text-sm text-muted">Test mode: no email is sent. Any code works, or none.</p>
           <div className="flex flex-wrap gap-3 max-sm:*:flex-1">
             <button type="button" onClick={() => setStep("email")} className={secondaryButton}>
               Back
@@ -138,7 +157,6 @@ function Orders({ db, email }: { db: Db; email: string }) {
           ))}
         </ul>
       )}
-      <p className="mt-12 text-xs text-muted">Test mode: your requests from this browser, plus two samples.</p>
     </>
   );
 }

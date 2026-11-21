@@ -113,11 +113,7 @@ function Shell({ children, email }: { children: ReactNode; email: string }) {
       <div className="min-w-0">
         <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 md:px-9">
           <AdminSearch />
-          <span className="ml-auto hidden items-center gap-1.5 text-[13px] text-muted sm:flex">
-            <i className="h-1.5 w-1.5 rounded-full bg-ink/30" />
-            Test Mode
-          </span>
-          <Link href="/admin/bookings?new=1" className={`${btnMain} max-sm:ml-auto`}>
+          <Link href="/admin/bookings?new=1" className={`${btnMain} ml-auto`}>
             New Booking
           </Link>
           <button

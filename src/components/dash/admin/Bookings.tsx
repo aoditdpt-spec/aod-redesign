@@ -56,7 +56,7 @@ export function Bookings() {
       <Drawer open={!!open} onClose={o.close} title={open?.id ?? ""} subtitle={open ? `${open.customer} · ${open.source}` : undefined}>
         {open && <BookingDetail key={open.id} id={open.id} onDeleted={o.close} />}
       </Drawer>
-      <Drawer open={o.isNew || o.value === "new"} onClose={o.close} title="New Booking" subtitle="Every field can be left empty in test mode.">
+      <Drawer open={o.isNew || o.value === "new"} onClose={o.close} title="New Booking">
         <NewBooking onDone={(id) => o.open(id)} />
       </Drawer>
     </>

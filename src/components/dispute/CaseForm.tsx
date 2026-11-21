@@ -61,7 +61,6 @@ export function CaseForm() {
             Track This Dispute
           </Link>
         </div>
-        <p className="mt-6 text-sm text-muted">Test mode: kept in this browser only. The admin&apos;s Dispute Desk shows it.</p>
       </div>
     );
 
@@ -188,7 +187,6 @@ export function CaseForm() {
         </Link>
         <button className={primaryButton}>Raise Dispute</button>
       </div>
-      <p className="text-sm text-muted">Test mode: nothing is required, and the case stays in this browser.</p>
     </form>
   );
 }
