@@ -21,7 +21,7 @@ const groups: { title: string; items: Item[] }[] = [
     items: [
       { href: "/admin", label: "Overview" },
       { href: "/admin/bookings", label: "Bookings", count: (c) => c.newRequests, hot: true },
-      { href: "/admin/applications", label: "Applications", count: (c) => c.applications },
+      { href: "/admin/applications", label: "Applications", count: (c) => c.applications, hot: true },
       { href: "/admin/artists", label: "Artists" },
       { href: "/admin/calendar", label: "Calendar" },
       { href: "/admin/payments", label: "Payments", count: (c) => c.toVerify, hot: true },
@@ -34,7 +34,6 @@ const groups: { title: string; items: Item[] }[] = [
       { href: "/admin/chat", label: "Chat With Artists", count: (c) => c.unread },
       { href: "/admin/messages", label: "Messages" },
       { href: "/admin/blog", label: "Blog" },
-      { href: "/admin/newsletter", label: "Newsletter" },
     ],
   },
   {
@@ -72,9 +71,11 @@ function Shell({ children, email }: { children: ReactNode; email: string }) {
         </Link>
         <div className="mt-1 hidden text-xs text-muted md:block">Admin</div>
         <nav aria-label="Admin" className="flex gap-4 md:block">
-          {groups.map((g) => (
-            <div key={g.title} className="flex gap-4 md:block">
-              <p className="mb-1 mt-6 hidden text-xs text-muted md:block">{g.title}</p>
+          {/* Work, Talk and Team: orange headings with a line between the groups (on request,
+              2026-11-21); on phones, where the menu is one row, a short upright line. */}
+          {groups.map((g, i) => (
+            <div key={g.title} className={`flex gap-4 md:block ${i > 0 ? "max-md:border-l max-md:border-line max-md:pl-4 md:mt-5 md:border-t md:border-line" : ""}`}>
+              <p className={`mb-1 hidden text-xs font-medium text-brand md:block ${i > 0 ? "mt-4" : "mt-6"}`}>{g.title}</p>
               {g.items.map((it) => {
                 const on = it.href === "/admin" ? path === "/admin" : path.startsWith(it.href);
                 const n = c && it.count ? it.count(c) : 0;
