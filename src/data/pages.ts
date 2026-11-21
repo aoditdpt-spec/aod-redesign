@@ -26,6 +26,7 @@ export const bookPage = {
   pickHours: "Pick A Length",
   hoursShort: (h: number) => `${h} Hrs`,
   back: "Back",
+  next: "Next",
   clear: "Clear All",
   fields: {
     date: "Date",

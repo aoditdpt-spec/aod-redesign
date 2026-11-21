@@ -20,18 +20,29 @@ const article = (word: string) => (/^[aeiou]/i.test(word) ? "an" : "a");
 export function ScrambleWord({ words, lead, stop = false, className = "" }: { words: string[]; lead?: string; stop?: boolean; className?: string }) {
   const el = useRef<HTMLSpanElement>(null);
   const leadEl = useRef<HTMLSpanElement>(null);
+  // The word showing, kept across the effect stopping and starting again.
+  const current = useRef(0);
 
   useEffect(() => {
     const node = el.current;
     if (!node || words.length < 2) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let index = 0;
+    let index = current.current % words.length;
     let frame = 0;
     let timer = 0;
 
     const setLead = (word: string) => {
       if (leadEl.current && lead) leadEl.current.textContent = `${lead} ${article(word)}`;
     };
+    // A whole word, with its dots: used on (re)start and when stopping, so the heading never keeps
+    // half-scrambled letters. Next.js keeps a page's HTML while you're on another page (cache
+    // components) and only stops its effects; leaving the homepage mid-scramble used to leave
+    // random letters there, which showed on the way back (2026-11-21).
+    const settle = (word: string) => {
+      setLead(word);
+      node.innerHTML = dotsHtml(word);
+    };
+    settle(words[index]);
 
     const scrambleTo = (word: string) => {
       setLead(word);
@@ -59,6 +70,7 @@ export function ScrambleWord({ words, lead, stop = false, className = "" }: { wo
         return;
       }
       index = (index + 1) % words.length;
+      current.current = index;
       if (still) {
         setLead(words[index]);
         node!.innerHTML = dotsHtml(words[index]);
@@ -70,6 +82,7 @@ export function ScrambleWord({ words, lead, stop = false, className = "" }: { wo
     return () => {
       cancelAnimationFrame(frame);
       window.clearTimeout(timer);
+      settle(words[index]);
     };
   }, [words, lead]);
 

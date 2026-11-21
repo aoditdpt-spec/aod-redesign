@@ -110,6 +110,30 @@ function nextDays(from: string, n: number) {
 
 type Contact = { name: string; phone: string; email: string };
 
+// The booking in progress, shared by /book (Get Your Artist) and the category pages, kept for this
+// tab (sessionStorage) (on request, 2026-11-21). Get Your Artist carries on from it; a category
+// page carries on only if it's the same category, otherwise it starts over with that category
+// (keeping the name, phone and email). Sending the request clears it. The business portal keeps
+// its own.
+type Draft = { cat: string | null; kind: string | null; count: number | null; step: number; reached: number; form: typeof blank };
+const DRAFT_KEY = "aod-book-draft";
+function readDraft(): Draft | null {
+  try {
+    const v = sessionStorage.getItem(DRAFT_KEY);
+    return v ? (JSON.parse(v) as Draft) : null;
+  } catch {
+    return null;
+  }
+}
+function writeDraft(d: Draft | null) {
+  try {
+    if (d) sessionStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    else sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // Storage blocked: the answers stay on this page only.
+  }
+}
+
 export function BookForm({ forceAudience, contact, presetCategory, presetDate }: { forceAudience?: Audience; contact?: Contact; presetCategory?: string; presetDate?: string }) {
   const chosenAudience = useAudience();
   const router = useRouter();
@@ -144,6 +168,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   const [stepState, setStep] = useState<number | null>(null);
   const step = stepState ?? (preset ? 1 : 0);
   const [dir, setDir] = useState(1);
+  const [reached, setReached] = useState(0); // the furthest question reached, for Next after Back
   const [kindState, setKind] = useState<string | null>(null);
   const kind = single ? (category?.types[0] ?? category?.name ?? null) : kindState;
   const [count, setCount] = useState<number | null>(null); // nothing picked to start with
@@ -179,21 +204,61 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
   const kindName = kind ?? category?.name ?? "";
   const needsText = kindName ? withCount(kindName, count ?? 1) : "";
 
-  // Book Again (My Bookings, the business portal): that order's answers, opened at the details.
+  // Each time the page is shown (Next.js keeps a page around and runs this again when you come
+  // back): Book Again's answers if there are some (My Bookings, the business portal), opened at the
+  // details; otherwise the booking in progress (see Draft above).
+  const shared = !forced;
+  const ready = useRef(false);
   useEffect(() => {
     const again = takeRebook();
-    if (!again) return;
+    const draft = shared ? readDraft() : null;
     void Promise.resolve().then(() => {
-      const c = again.categories[0] ?? null;
-      const k = (c && again.kinds[c]?.[0]) || categories.find((x) => x.slug === c)?.types[0] || null;
-      setPicked(c);
-      setKind(k);
-      setCount((k && again.counts[k]) || 1);
-      setForm((f) => ({ ...f, venue: { ...blankVenue, text: again.venue }, time: again.time, hours: again.hours, details: again.details }));
-      moved.current = true;
-      setStep(LAST);
+      if (again) {
+        const c = again.categories[0] ?? null;
+        const k = (c && again.kinds[c]?.[0]) || categories.find((x) => x.slug === c)?.types[0] || null;
+        setPicked(c);
+        setKind(k);
+        setCount((k && again.counts[k]) || 1);
+        setForm((f) => ({ ...f, venue: { ...blankVenue, text: again.venue }, time: again.time, hours: again.hours, details: again.details }));
+        moved.current = true;
+        setStep(LAST);
+        setReached(LAST);
+        setView("form");
+      } else if (shared) {
+        setShowMore(false);
+        setMissing([]);
+        setView("form");
+        if (draft && (!preset || draft.cat === preset)) {
+          setPicked(draft.cat);
+          setKind(draft.kind);
+          setCount(draft.count);
+          setForm(draft.form);
+          setStep(draft.step);
+          setReached(draft.reached);
+        } else {
+          // A different category (or nothing yet): start over with this one.
+          const fresh = { ...blank, name: draft?.form.name ?? "", phone: draft?.form.phone ?? "", email: draft?.form.email ?? "" };
+          setPicked(undefined);
+          setKind(null);
+          setCount(null);
+          setForm(fresh);
+          setStep(null);
+          setReached(0);
+          writeDraft({ cat: preset || null, kind: null, count: null, step: preset ? 1 : 0, reached: 0, form: fresh });
+        }
+      }
+      ready.current = true;
     });
-  }, []);
+    return () => {
+      ready.current = false;
+    };
+  }, [shared, preset]);
+
+  // Keep the booking in progress as it changes; a sent request clears it.
+  useEffect(() => {
+    if (!shared || !ready.current) return;
+    writeDraft(view === "done" ? null : { cat, kind: kindState, count, step, reached, form });
+  }, [shared, view, cat, kindState, count, step, reached, form]);
 
   // Already signed in with this email? Typing it skips the code.
   useEffect(() => {
@@ -216,6 +281,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     moved.current = true;
     setDir(to >= step ? 1 : -1);
     setStep(to);
+    setReached((r) => Math.max(r, to));
   };
   function clearAll() {
     setPicked(null);
@@ -224,15 +290,20 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     setShowMore(false);
     setForm({ ...blank, ...contact });
     setMissing([]);
+    setReached(0);
     goStep(0);
   }
   const back = () => goStep(step - 1);
+  // Next shows after Back, while the question on screen is still answered.
+  const canNext = step < reached && (step === 0 ? Boolean(cat) : step === 1 ? Boolean(kind && count) : false);
+  const next = () => goStep(step + 1);
 
   const pickCategory = (slug: string) => {
     if (slug !== cat) {
       setKind(null);
       setCount(null);
       setShowMore(false);
+      setReached(1);
     }
     setPicked(slug);
     goStep(1);
@@ -242,6 +313,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     if (k !== kindState) {
       setCount(null);
       setShowMore(false);
+      setReached((r) => Math.min(r, 1));
     }
     setKind(k);
   };
@@ -363,6 +435,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
     setSaveError(null);
     setDir(-1);
     setStep(0);
+    setReached(0);
     moved.current = true;
     setView("form");
   }
@@ -415,7 +488,7 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
         </p>
       )}
 
-      {/* Progress, with Back and Clear All. */}
+      {/* Progress, with Back, Next (after going back) and Clear All. */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-t border-ink pt-5">
         <div className="flex items-center gap-3 text-sm text-muted">
           <span>{p.question(step + 1, p.steps.length)}</span>
@@ -429,6 +502,11 @@ function Questions({ audience, forced, contact, presetCategory, presetDate }: { 
           {step > 0 && (
             <button type="button" onClick={back} className={textButton}>
               {p.back}
+            </button>
+          )}
+          {canNext && (
+            <button type="button" onClick={next} className={textButton}>
+              {p.next}
             </button>
           )}
           <button type="button" onClick={clearAll} disabled={!cat && JSON.stringify(form) === JSON.stringify({ ...blank, ...contact })} className={textButton}>
