@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Avatar } from "@/components/ui/Avatar";
 import Link from "next/link";
+import { MainSiteLink } from "@/components/ui/MainSiteLink";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { artistUnread, myOrders, useDb } from "@/lib/mock-db";
@@ -58,16 +59,19 @@ export function PortalShell({ children }: { children: ReactNode }) {
             </div>
           )}
           <div className="mt-5 flex gap-4 text-xs text-muted">
-            <Link href="/" className="hover:text-ink">
-              Main Site
-            </Link>
             <Link href="/artists/sign-in" onClick={() => setPortalEmail("")} className="hover:text-ink">
               Sign Out
             </Link>
           </div>
         </div>
       </aside>
-      <main className="min-w-0 max-w-[1120px] px-4 pb-24 pt-7 md:px-12 md:pt-10">{children}</main>
+      <main className="min-w-0 max-w-[1120px] px-4 pb-24 pt-5 md:px-12 md:pt-6">
+        {/* Back To Main Site, on every device (the portal is its own site, artists.aod.co.in). */}
+        <div className="mb-5 flex justify-end md:mb-6">
+          <MainSiteLink />
+        </div>
+        {children}
+      </main>
     </div>
   );
 }

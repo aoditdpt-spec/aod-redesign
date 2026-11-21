@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { MainSiteLink } from "@/components/ui/MainSiteLink";
 import { useState, useSyncExternalStore } from "react";
 import { btn, btnMain, field, label } from "./ui";
 
@@ -82,9 +82,7 @@ export function AdminSignIn() {
           </form>
         )}
         <p className="mt-6 text-xs text-muted">Test mode: no email is sent. Any code works, or none.</p>
-        <Link href="/" className="mt-10 block text-xs text-muted hover:text-ink">
-          Back To Main Site
-        </Link>
+        <MainSiteLink className="mt-10" />
       </div>
     </div>
   );

@@ -74,16 +74,38 @@ export const businessPage = {
     { title: "Corporates", text: "Conferences, town halls and product launches." },
     { title: "Expos", text: "Official coverage, from the stall to the stage." },
   ],
+  // From aod.co.in/business (2026-11-21).
+  whyTitle: "Why Procurement Teams Like Us",
+  why: [
+    "Digital contracts on every engagement",
+    "Transparent quotes upfront: budget approvals without surprises",
+    "Dedicated account manager and single point of contact",
+    "Priority replacement guarantee: coverage never falls through",
+    "One company account: a calendar of every booking, and each order tracked from inquiry to payment received",
+  ],
+  caseStudy: { title: "GATE Expo: Official Visual Partner", text: "AOD delivered end-to-end visual coverage as official partner." },
 };
 
 export const artistsPage = {
   label: "For Artists",
   title: "Get Booked For What You Do Best.",
   meta: "Photographers, filmmakers, anchors, singers, DJs, comedians, models and makeup artists: join AOD and get booked.",
-  points: [
-    { title: "Apply", text: "Tell us about your work. It takes a few minutes." },
-    { title: "Get Verified", text: "We review your work and do a trial booking." },
-    { title: "Get Booked", text: "Requests that fit your craft come to you." },
+  // The rest of aod.co.in/for-artists (2026-11-21), headings in Title Case.
+  whyTitle: "Your Talent Deserves The Right Stage",
+  why: [
+    { title: "Your Talent, In The Right Place", text: "We match you to events that fit your style, so your skills are used where they count." },
+    { title: "A Fair Rate For Your Work", text: "Clear quotes agreed upfront. No undercutting, no haggling: you're paid what your work is worth." },
+    { title: "Steady Work", text: "Weddings, corporate contracts and expo coverage: regular bookings across Gujarat." },
+    { title: "Grow Your Potential", text: "A verified badge, reviews and a portfolio that grows with every booking you deliver." },
+  ],
+  verifyTitle: "We Verify Every Artist Thoroughly",
+  verifyText:
+    "No one joins AOD from a form alone. Our team reviews your work, checks your background and references, and runs a trial booking, so clients know exactly who is walking into their event. Zero joining fees: we only earn when you do.",
+  joinTitle: "How Joining Works",
+  steps: [
+    { title: "Apply With Your Work", text: "Share your portfolio, links and experience online. Our team reviews every application." },
+    { title: "Portfolio & Background Check", text: "Our creative team reviews your style and quality, and verifies your identity and references." },
+    { title: "Trial Booking & Go Live", text: "One supervised booking to confirm professionalism and punctuality, then the bookings start coming." },
   ],
   // Joining is through the artist portal only (no WhatsApp).
   apply: "Apply To Join",
@@ -116,14 +138,19 @@ export const disputePage = {
     { title: "Escalation If Needed", text: "Still not settled? AOD's grievance officer reviews it, and you can take it further." },
   ],
   pathsTitle: "Booked Through AOD, Or Not?",
+  pathsText: "The Dispute Desk takes both. How a case runs depends on where the booking was made.",
+  // Over the picture of a case being tracked, beside the intro.
+  previewLabel: "What You'll See",
   paths: {
     aod: {
       title: "Booked Through AOD",
       text: "AOD arranged the booking and took the payment, so a settlement can include a refund or payout under AOD's refund policy, or a replacement artist.",
+      cta: "Raise An AOD Dispute",
     },
     outside: {
       title: "Booked Outside AOD",
       text: "Booked directly, through another platform or by word of mouth? The Dispute Desk mediates those too, free. You don't need an AOD account or booking number.",
+      cta: "Raise A Non-AOD Dispute",
       steps: [
         { title: "Tell Us What Happened", text: "Who it's with and how to reach them, what was agreed, and what would settle it for you." },
         { title: "We Contact The Other Side", text: "AOD reaches out by phone, WhatsApp or email to hear their side. Taking part is up to them." },
@@ -147,6 +174,7 @@ export const disputePage = {
   // Artists first: most disputes are an artist chasing a client. Each side's issues are about the other side.
   roles: [
     {
+      id: "artist",
       title: "I'm An Artist",
       text: "A problem with a client: unpaid, ghosted or cancelled.",
       issues: [
@@ -161,6 +189,7 @@ export const disputePage = {
       ],
     },
     {
+      id: "customer",
       title: "I Booked An Artist",
       text: "A problem with the artist you booked.",
       issues: [
@@ -175,6 +204,7 @@ export const disputePage = {
       ],
     },
     {
+      id: "business",
       title: "I Booked For A Business",
       text: "A problem with an artist on a business booking.",
       issues: [
@@ -235,3 +265,24 @@ export const audiencePrompt = {
   change: "Change",
   close: "Close",
 } as const;
+
+// The newsletter's confirm and unsubscribe pages, opened from the links in its emails, as on
+// aod.co.in (src/content/blog.ts there), 2026-11-21. Nobody new can subscribe (the sign-up was
+// removed there too); these keep working for anyone already on the list. Mock mode: nothing saved.
+export const newsletterPages = {
+  confirm: {
+    title: "Confirm Your Subscription.",
+    text: "One tap and you're on the list for the AOD newsletter.",
+    button: "Yes, Subscribe Me",
+    doneTitle: "You're Subscribed.",
+    doneText: "Thanks! The next AOD newsletter will land in your inbox.",
+  },
+  unsubscribe: {
+    title: "Unsubscribe From The AOD Newsletter.",
+    text: "You'll stop getting the newsletter. Booking emails (confirmations and updates) aren't affected.",
+    button: "Unsubscribe",
+    doneTitle: "You're Unsubscribed.",
+    doneText: "You won't get the AOD newsletter any more.",
+  },
+  testNote: "Test mode: nothing is saved.",
+};

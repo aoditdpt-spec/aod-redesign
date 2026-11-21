@@ -302,7 +302,10 @@ export function ApplyForm() {
                         <span className="pl-4 text-muted">instagram.com/</span>
                         <input value={f.instagram} onChange={(e) => setF({ ...f, instagram: e.target.value.replace(/^@/, "") })} placeholder="yourname" aria-label="Instagram username" className="h-full min-w-0 flex-1 bg-transparent pr-4 outline-none" />
                       </span>
-                      <input value={f.link} onChange={set("link")} inputMode="url" placeholder="Or a portfolio or showreel link" aria-label="Portfolio or showreel link" className={`${input} mt-3`} />
+                      {/* Both the Instagram username and the portfolio link will be required once the
+                          backend is connected (on request, 2026-11-21; as aod.co.in's both-links
+                          rule, hasBothLinks()). Test mode: both can stay empty. */}
+                      <input value={f.link} onChange={set("link")} inputMode="url" placeholder="Portfolio link" aria-label="Portfolio link" className={`${input} mt-3`} />
                       {/* Checked as they type (src/lib/portfolio-links.ts, from aod.co.in); a note, not a block, in test mode. */}
                       {linkCheck && <span className={`mt-2 block text-sm ${linkCheck.ok ? "text-muted" : "text-red-600"}`}>{linkCheck.ok ? (linkCheck.warning ?? `Looks good: ${linkCheck.label}.`) : linkCheck.message}</span>}
                     </div>

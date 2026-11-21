@@ -172,7 +172,7 @@ function LaptopPanel({ onClose }: { onClose: () => void }) {
                 onClick={() => go(r)}
                 className={`flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors ${i === active ? "bg-wash" : ""}`}
               >
-                <Image src={r.category.image} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-md object-cover" />
+                <Image src={r.category.image} alt="" width={40} height={40} className="h-10 w-10 shrink-0 rounded-md bg-wash object-contain" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[15px] font-medium text-ink">{r.title}</span>
                   <span className="block truncate text-[13px] text-muted">{r.detail}</span>

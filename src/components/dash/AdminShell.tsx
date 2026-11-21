@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { MainSiteLink } from "@/components/ui/MainSiteLink";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { counts, useDb } from "@/lib/mock-db";
@@ -96,9 +97,6 @@ function Shell({ children, email }: { children: ReactNode; email: string }) {
         <div className="hidden pt-8 text-xs text-muted md:block">
           <span className="block truncate">{name}</span>
           <span className="mt-2 flex gap-4">
-            <Link href="/" className="hover:text-ink">
-              Main Site
-            </Link>
             <button type="button" onClick={() => setAdminSession("")} className="hover:text-ink">
               Sign Out
             </button>
@@ -109,6 +107,8 @@ function Shell({ children, email }: { children: ReactNode; email: string }) {
       <div className="min-w-0">
         <div className="flex items-center gap-2.5 border-b border-line px-4 py-3 md:px-9">
           <AdminSearch />
+          {/* Back To Main Site, on every device (the admin is its own site, admin.aod.co.in). */}
+          <MainSiteLink className="max-sm:h-8 max-sm:px-2.5 max-sm:text-xs" />
           <span className="ml-auto hidden items-center gap-1.5 text-[13px] text-muted sm:flex">
             <i className="h-1.5 w-1.5 rounded-full bg-ink/30" />
             Test Mode

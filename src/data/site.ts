@@ -21,7 +21,7 @@ export type Category = {
   slug: string;
   name: string;
   blurb: string;
-  image: string; // used by the search's photos on laptops
+  image: string; // the search's pictures: the category's cut-out (the old photos were deleted, 2026-11-21)
   keywords: string[]; // extra words the search understands
   // The kinds of artist in it (the categories the live site had before they were merged), asked
   // in the booking's second question. A category with one kind skips that question.
@@ -41,7 +41,7 @@ export const categories: Category[] = [
     slug: "photo-video",
     name: "Photography & Film",
     blurb: "Photographers, Cinematographers and Drones",
-    image: "/categories/photographers.jpg",
+    image: "/categories/icons/cutout-photographer.png",
     types: ["Photographers", "Cinematographers", "Drone Operators"],
     keywords: ["photo", "photos", "photography", "photographer", "camera", "shoot", "video", "videos", "videography", "videographer", "film", "films", "filmmaker", "cinematographer", "cinematography", "drone", "aerial"],
     groups: [
@@ -103,7 +103,7 @@ export const categories: Category[] = [
     slug: "anchors-hosts",
     name: "Anchors and Hosts",
     blurb: "Conferences, Corporate Events, Ceremonies and more",
-    image: "/categories/anchors-hosts.jpg",
+    image: "/categories/icons/cutout-anchor.png",
     types: ["Anchors", "Hosts"],
     keywords: ["anchor", "anchors", "host", "hosts", "emcee", "mc", "compere"],
     groups: [
@@ -128,7 +128,7 @@ export const categories: Category[] = [
     slug: "musicians-djs",
     name: "Musicians & DJs",
     blurb: "Live Bands, Singers and DJs for Sangeets, Receptions and After-Parties",
-    image: "/categories/musicians-djs.jpg",
+    image: "/categories/icons/cutout-musician.png",
     types: ["Musicians", "DJs", "Singers"],
     keywords: ["music", "musician", "musicians", "band", "bands", "dj", "djs", "singer", "singers", "vocalist", "vocals", "garba", "sufi", "ghazal"],
     groups: [
@@ -161,7 +161,7 @@ export const categories: Category[] = [
     slug: "comedians",
     name: "Stand-Up Comedians",
     blurb: "Clean, Crowd-Ready Sets for Corporate Nights, Parties and Festivals",
-    image: "/categories/comedians.jpg",
+    image: "/categories/icons/cutout-comedian.png",
     types: ["Stand-Up Comedians"],
     keywords: ["comedy", "comedian", "comedians", "stand up", "standup"],
     groups: [
@@ -184,7 +184,7 @@ export const categories: Category[] = [
     slug: "models-creators",
     name: "Models & Creators",
     blurb: "Runway, Brand Campaigns, Product Launches and Reels",
-    image: "/categories/models.jpg",
+    image: "/categories/icons/cutout-model.png",
     types: ["Models", "Influencers", "Reel Creators"],
     keywords: ["model", "models", "modelling", "fashion", "influencer", "influencers", "creator", "creators", "content", "reel", "reels", "instagram", "ugc"],
     groups: [
@@ -211,7 +211,7 @@ export const categories: Category[] = [
     slug: "makeup-styling",
     name: "Makeup & Styling",
     blurb: "Bridal Looks and Camera-Ready Glam for Every Event",
-    image: "/categories/makeup-artists.jpg",
+    image: "/categories/icons/cutout-makeup.png",
     types: ["Makeup Artists"], // one kind, so booking goes straight to How Many? (no hair stylists, 2026-11-21)
     keywords: ["makeup", "make up", "mua", "bridal", "stylist", "styling"],
     groups: [
@@ -235,7 +235,7 @@ export type NavLink = { href: string; label: string };
 export const navLinks: NavLink[] = [
   { href: "/business", label: "For Business" },
   { href: "/artists", label: "For Artists" },
-  { href: "/portfolio", label: "Portfolio" }, // in the navbar only, in place of the Dispute Desk (2026-11-20; the Dispute Desk stays everywhere else)
+  { href: "/dispute-desk", label: "Dispute Desk" }, // back in place of the Portfolio page, which was removed (2026-11-21)
   { href: "/about", label: "About Us" },
 ];
 

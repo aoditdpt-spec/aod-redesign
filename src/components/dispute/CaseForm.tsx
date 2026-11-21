@@ -11,7 +11,8 @@ import { primaryButton, secondaryButton } from "@/components/ui/buttons";
 // Raise a dispute, as on aod.co.in: which side you're on, what it's about, whether it was booked
 // through AOD (then its number) or not (then who it's with and how to reach them), what happened,
 // what would settle it, evidence links and your details. "?ref=AOD-…" (My Bookings) fills in the
-// booking number. Test mode: nothing is required, and the case is kept in this browser, where the
+// booking number; "?role=artist|customer|business" picks the side and "?aod=yes|no" answers "Was It
+// Booked Through AOD?" (the Dispute Desk page's buttons, as on aod.co.in). Test mode: nothing is required, and the case is kept in this browser, where the
 // admin's Dispute Desk shows it.
 
 const input = "h-12 w-full rounded-lg border border-line bg-paper px-4 text-base outline-none transition-colors placeholder:text-muted focus:border-ink";
@@ -19,13 +20,16 @@ const label = "mb-2 block text-sm text-muted";
 const chip = (on: boolean) => `min-h-12 rounded-lg border px-4 py-2.5 text-left text-[15px] transition-colors ${on ? "border-ink bg-ink text-paper" : "border-line hover:border-ink"}`;
 
 const noop = () => () => {};
-function useRefParam() {
-  return useSyncExternalStore(noop, () => new URLSearchParams(window.location.search).get("ref") ?? "", () => "");
+function useParam(name: string) {
+  return useSyncExternalStore(noop, () => new URLSearchParams(window.location.search).get(name) ?? "", () => "");
 }
 
 export function CaseForm() {
-  const ref = useRefParam();
-  const [side, setSide] = useState<Side | "">("");
+  const ref = useParam("ref");
+  const roleParam = useParam("role");
+  const aodParam = useParam("aod");
+  const [sideState, setSide] = useState<Side | "" | null>(null);
+  const side: Side | "" = sideState ?? (["artist", "customer", "business"].includes(roleParam) ? (roleParam as Side) : "");
   const [about, setAbout] = useState("");
   const [through, setThrough] = useState<boolean | null>(null);
   const [booking, setBooking] = useState<string | null>(null);
@@ -38,7 +42,7 @@ export function CaseForm() {
   const [sent, setSent] = useState<string | null>(null);
 
   const bookingRef = booking ?? ref;
-  const isThrough = through ?? (ref ? true : null);
+  const isThrough = through ?? (ref || aodParam === "yes" ? true : aodParam === "no" ? false : null);
   const issues = side ? (disputePage.roles[["artist", "customer", "business"].indexOf(side)]?.issues ?? []) : [];
   const outcomes = side ? (isThrough === false ? f.outcomesOutside : f.outcomes)[side] : [];
 

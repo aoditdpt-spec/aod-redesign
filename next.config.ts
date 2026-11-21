@@ -12,6 +12,19 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // aod.co.in's addresses that are named differently here (2026-11-21), so old links, bookmarks and
+  // emails still land on the right page.
+  async redirects() {
+    return [
+      { source: "/for-artists", destination: "/artists", permanent: true },
+      { source: "/book/personal", destination: "/book", permanent: true },
+      { source: "/book/business", destination: "/business", permanent: true },
+      { source: "/resolve", destination: "/dispute-desk", permanent: true },
+      { source: "/resolve/:path(new|track)", destination: "/dispute-desk/:path", permanent: true },
+      { source: "/admin/dashboard", destination: "/admin", permanent: true },
+      { source: "/admin/resolution", destination: "/admin/disputes", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
