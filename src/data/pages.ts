@@ -65,6 +65,7 @@ export const bookPage = {
   copySent: "A copy is on its way to",
   another: "Book Another Event",
   myBookings: "Go To My Bookings",
+  yourOrders: "Go To Your Orders", // the business portal's version
   previewNote: "Test mode: mock data, kept in this browser only.",
   rows: { who: "Who" },
 };
