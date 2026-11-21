@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { act, type Stage } from "@/lib/mock-db";
+import type { Stage } from "@/lib/mock-db";
 import { useMounted } from "@/lib/use-mounted";
 
 // The admin's and the artist portal's building blocks, from the design tests
@@ -182,18 +182,6 @@ export function Toggle({ on, onChange, label: text }: { on: boolean; onChange: (
     <button type="button" role="switch" aria-checked={on} aria-label={text} onClick={() => onChange(!on)} className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${on ? "bg-ink" : "bg-line"}`}>
       <i className={`absolute top-1 h-4 w-4 rounded-full bg-paper transition-[left] ${on ? "left-5" : "left-1"}`} />
     </button>
-  );
-}
-
-// Said wherever it matters: nothing here reaches a database.
-export function TestNote({ className = "" }: { className?: string }) {
-  return (
-    <p className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted ${className}`}>
-      <span>Test Mode: sample data. Changes stay in this browser.</span>
-      <button type="button" onClick={() => act.reset()} className="underline underline-offset-2 hover:text-ink">
-        Reset Sample Data
-      </button>
-    </p>
   );
 }
 

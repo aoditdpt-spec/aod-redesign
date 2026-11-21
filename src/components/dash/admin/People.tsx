@@ -1,19 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
 import { useState } from "react";
 import { categories, cities } from "@/data/site";
 import { act, ago, appStageLabel, appStages, catName, openStage, shortDate, stageLabel, useDb, type AppStage, type Artist } from "@/lib/mock-db";
 import { meetingWhen } from "./Overview";
-import { workQuestions } from "@/data/work-questions";
+import { kindName, workAnswerLabel } from "@/data/work-questions";
 
 // "photo-video.level" → "Photography & Film: Are You A Professional…"
-const workLabel = (key: string) => {
-  const [cat, id] = key.split(".");
-  const q = workQuestions[cat]?.find((x) => x.id === id);
-  return `${catName(cat)}: ${q?.label.replace(/\?$/, "") ?? id}`;
-};
-import { Drawer, Head, Loading, Rows, Status, Tabs, TestNote, Title, btn, btnInk, btnMain, field, label, stageTone, sub, td, th, useOpen } from "../ui";
+import { Drawer, Head, Loading, Rows, Status, Tabs, Title, btn, btnInk, btnMain, field, label, stageTone, sub, td, th, useOpen } from "../ui";
 
 // Applications: review → meeting → trial → approved, each opening in the drawer.
 export function Applications() {
@@ -64,7 +60,6 @@ export function Applications() {
           ))}
         </tbody>
       </table>
-      <TestNote className="mt-10" />
 
       <Drawer open={!!open} onClose={o.close} title={open?.name ?? ""} subtitle={open ? `${open.id} · ${open.craft}` : undefined}>
         {open && (
@@ -85,7 +80,9 @@ export function Applications() {
                 ["Date Of Birth", open.details?.dob ?? ""],
                 ["Area", open.details?.area ?? ""],
                 ["Languages", open.details?.languages?.join(", ") ?? ""],
-                ["Also Works In", open.details?.other?.map(catName).join(", ") ?? ""],
+                ["Mainly Works As", open.details?.kind ? kindName(open.details.kind) : ""],
+                ["Also Works As", open.details?.other?.map(kindName).join(", ") ?? ""],
+                ["Services", open.details?.services?.join(", ") ?? ""],
                 ["About", open.details?.about ?? ""],
                 ["Declaration", open.details?.agree ? "Agreed" : ""],
               ]}
@@ -93,7 +90,7 @@ export function Applications() {
             {open.details?.work && Object.keys(open.details.work).length > 0 && (
               <section>
                 <Head title="Work Details" />
-                <Rows rows={Object.entries(open.details.work).map(([k, v]): [string, string] => [workLabel(k), Array.isArray(v) ? v.join(", ") : v])} />
+                <Rows rows={Object.entries(open.details.work).map(([k, v]): [string, string] => [workAnswerLabel(k), Array.isArray(v) ? v.join(", ") : v])} />
               </section>
             )}
             {open.submittedAt && <p className="text-[13px] text-muted">Sent for review by the applicant {ago(open.submittedAt)}.</p>}
@@ -177,7 +174,6 @@ export function Artists() {
           ))}
         </tbody>
       </table>
-      <TestNote className="mt-10" />
 
       <Drawer open={o.value === "new"} onClose={o.close} title="Add Artist" subtitle="Every field can be left empty in test mode.">
         <ArtistForm onSave={(a) => o.open(act.addArtist({ name: a.name ?? "", craft: a.craft ?? "", cats: a.cats ?? [], city: a.city ?? "", email: a.email ?? "", phone: a.phone ?? "", photo: "" }))} cta="Add Artist" />
@@ -196,9 +192,15 @@ export function Artists() {
                 ["Live Since", shortDate(open.since)],
               ]}
             />
-            <button type="button" onClick={() => act.toggleArtist(open.id)} className={btn}>
-              {open.active ? "Pause Artist" : "Activate Artist"}
-            </button>
+            <div className="flex flex-wrap gap-2">
+              {/* Opens this artist's conversation in Chat With Artists. */}
+              <Link href={`/admin/chat?artist=${open.id}`} className={btnMain}>
+                Message {open.name.split(" ")[0]}
+              </Link>
+              <button type="button" onClick={() => act.toggleArtist(open.id)} className={btn}>
+                {open.active ? "Pause Artist" : "Activate Artist"}
+              </button>
+            </div>
             <section>
               <Head title="Edit Profile" />
               <ArtistForm key={open.id} initial={open} onSave={(a) => act.editArtist(open.id, a)} cta="Save Changes" />

@@ -10,7 +10,7 @@ import { usePortalEmail } from "@/lib/portal-session";
 import { ApplicantDashboard } from "./Applicant";
 import { CompleteProfile } from "./CompleteProfile";
 import { MonthGrid, MonthSwitch } from "../MonthGrid";
-import { Head, HeadLink, Loading, TestNote, btn, btnInk, btnMain, btnText, field, label } from "../ui";
+import { Head, HeadLink, Loading, btn, btnInk, btnMain, btnText, field, label } from "../ui";
 
 // The artist portal's pages (design-tests/test1.html), for the sample artist ART-201 (Aman Shah,
 // a photographer). Requests are the admin's new orders in their category, so accepting one shows
@@ -124,7 +124,6 @@ export function Dashboard() {
           <Steps db={db} />
         </div>
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -287,7 +286,6 @@ export function Bookings() {
       {group("Upcoming", o.upcoming, (b) => (b.stage === "confirmed" || b.stage === "advance" ? "Confirmed" : "You're Chosen"))}
       {group("Completed", o.completed, () => "Completed")}
       {group("Declined Or Cancelled", o.declined, (b) => (b.stage === "cancelled" ? "Cancelled" : "Declined"))}
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -308,7 +306,6 @@ export function Availability() {
         <SmallCalendar db={db} month={m} />
       </div>
       <p className="mt-6 text-sm text-muted">{db.daysOff.filter((d) => d >= db.todayKey).length} Days Off Ahead</p>
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -343,7 +340,6 @@ export function Approval() {
           </ul>
         </section>
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -366,7 +362,7 @@ export function ProfilePage() {
   const db = useDb();
   const email = usePortalEmail();
   if (!db) return <Loading />;
-  // A new artist (signed up, not yet approved): Complete Your Profile.
+  // A new artist (signed up, not yet approved): Complete Your Details.
   const applicant = email ? db.applications.find((a) => a.email.toLowerCase() === email && a.stage !== "approved") : undefined;
   if (applicant) return <CompleteProfile key={applicant.id} app={applicant} />;
   return <ProfileForm key={JSON.stringify(db.profile)} profile={db.profile} />;
@@ -402,7 +398,6 @@ function ProfileForm({ profile }: { profile: Profile }) {
           {saved && <span className="text-sm text-muted">Saved In This Browser.</span>}
         </div>
       </form>
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -446,10 +441,9 @@ export function MessagesPage() {
   return (
     <>
       <PageTitle title="Messages" text="Your conversation with the AOD team." />
-      <div className="mt-6 max-w-2xl">
+      <div className="mt-6 max-w-3xl">
         <ChatThread artist={ME} side="artist" />
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }
@@ -476,7 +470,6 @@ export function Documents() {
           Ask AOD About A Document
         </Link>
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }

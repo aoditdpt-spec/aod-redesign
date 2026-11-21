@@ -6,7 +6,7 @@ import { buildXlsx } from "@/lib/xlsx";
 import { useExcelExport } from "../ExcelExport";
 import { act, ago, appStageLabel, catName, openStage, rupees, sameMonth, settingList, stages, useDb, type Staff } from "@/lib/mock-db";
 import { categories } from "@/data/site";
-import { Head, Loading, Nums, TestNote, Title, Toggle, btn, btnMain, field, label, sub, td, th } from "../ui";
+import { Head, Loading, Nums, Title, Toggle, btn, btnMain, field, label, sub, td, th } from "../ui";
 
 // Reports And Exports: the month in numbers, orders by category and stage, and CSV downloads.
 export function Reports() {
@@ -72,7 +72,6 @@ export function Reports() {
         ))}
       </div>
       {dialog}
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -147,7 +146,6 @@ export function TeamRoles() {
         </label>
         <button className={`${btnMain} h-10`}>Add</button>
       </form>
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -168,7 +166,6 @@ export function ActivityLog() {
           </li>
         ))}
       </ul>
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -190,7 +187,6 @@ export function Settings() {
           </li>
         ))}
       </ul>
-      <TestNote className="mt-10" />
     </>
   );
 }

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { ago, appStages, shortDate, type Application } from "@/lib/mock-db";
 import { completeness } from "./CompleteProfile";
 import { meetingWhenPlain } from "./time";
-import { btnMain, TestNote } from "../ui";
+import { btnMain } from "../ui";
 
 // The portal for someone who has applied but isn't approved yet, as on aod.co.in: where their
 // application is (sent, portfolio review, meeting with its time, trial booking, approved), what
-// AOD checks, and Complete Your Profile (Profile page), where they submit it for review.
+// AOD checks, and Complete Your Details (Profile page), where they submit it for review.
 
 const texts: Record<string, string> = {
   review: "Our team is reviewing your portfolio. We'll message you if we need anything else.",
@@ -53,13 +53,13 @@ export function ApplicantDashboard({ app }: { app: Application }) {
           </ol>
         </section>
         <section>
-          <h2 className="mb-4 text-[17px]">Complete Your Profile</h2>
+          <h2 className="mb-4 text-[17px]">Complete Your Details</h2>
           <p className="text-muted">{completeness(app)}% complete. Add your photo and a few questions about your work, then submit it for review.</p>
           <div className="mt-3 h-1 rounded-full bg-line">
             <i className="block h-full rounded-full bg-ink" style={{ width: `${completeness(app)}%` }} />
           </div>
           <Link href="/artists/profile" className={`${btnMain} mt-4`}>
-            Complete Your Profile
+            Complete Your Details
           </Link>
           {app.submittedAt && <p className="mt-3 text-sm text-muted">Sent for review {ago(app.submittedAt)}.</p>}
           <h2 className="mb-3 mt-10 text-[17px]">What AOD Checks</h2>
@@ -72,7 +72,6 @@ export function ApplicantDashboard({ app }: { app: Application }) {
           </ul>
         </section>
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }

@@ -157,8 +157,11 @@ const ORDERS = "aod-mock-orders";
 // Artist applications sent from /artists/apply (ApplyForm.tsx), kept in this browser.
 export const APPS = "aod-mock-applications";
 export type SentApplication = { id: string; name: string; email: string; phone: string; city: string; cat: string; craft: string; photo?: string; experience?: string; instagram?: string; link?: string; at: string };
-// What an applicant adds in the portal's Complete Your Profile (after the 2-step sign-up).
-export type AppDetails = { photo?: string; dob?: string; area?: string; languages?: string[]; other?: string[]; about?: string; agree?: boolean; work?: Record<string, string | string[]> };
+// What an applicant adds in the portal's Complete Your Details (after the 2-step sign-up).
+// Complete Your Details (CompleteProfile.tsx): `kind` is what they mainly do and `other` the other
+// kinds they also do (work-questions.ts), `services` the services they offer, `work` each kind's
+// answers by "<kind>.<question id>".
+export type AppDetails = { photo?: string; dob?: string; area?: string; languages?: string[]; kind?: string; other?: string[]; services?: string[]; about?: string; agree?: boolean; work?: Record<string, string | string[]> };
 const DAY = 864e5;
 
 const pad = (n: number) => String(n).padStart(2, "0");

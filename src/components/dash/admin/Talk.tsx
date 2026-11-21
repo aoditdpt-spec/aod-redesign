@@ -2,19 +2,22 @@
 
 import { Avatar } from "@/components/ui/Avatar";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { timeRange } from "@/lib/event-time";
 import { rupees, shortDate, teamUnread, templates, useDb } from "@/lib/mock-db";
 import { ChatThread } from "../ChatThread";
-import { Head, Loading, TestNote, Title, field, label } from "../ui";
+import { Head, Loading, Title, field, label } from "../ui";
 
 // Chat With Artists: every artist on the left (unread first), the conversation on the right.
+// "?artist=ART-201" (the artist drawer's Message button) opens that artist's conversation.
 export function Chat() {
   const db = useDb();
+  const asked = useSearchParams().get("artist");
   const [pick, setPick] = useState<string | null>(null);
   if (!db) return <Loading />;
   const last = (id: string) => db.messages.filter((m) => m.artist === id).at(-1);
   const list = db.artists.slice().sort((a, b) => teamUnread(db, b.id) - teamUnread(db, a.id) || (last(b.id)?.at ?? "").localeCompare(last(a.id)?.at ?? ""));
-  const current = pick ?? list[0]?.id;
+  const current = pick ?? (asked && db.artists.some((a) => a.id === asked) ? asked : list[0]?.id);
   const artist = db.artists.find((a) => a.id === current);
 
   return (
@@ -47,7 +50,6 @@ export function Chat() {
           </div>
         )}
       </div>
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -100,7 +102,6 @@ export function Messages() {
           </section>
         ))}
       </div>
-      <TestNote className="mt-10" />
     </>
   );
 }

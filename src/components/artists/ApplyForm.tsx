@@ -17,7 +17,7 @@ import { primaryButton, secondaryButton } from "@/components/ui/buttons";
 //   2  location, category (and which kind), experience and a portfolio link
 // That creates the profile. Everything else (photo, date of birth, languages, the category's own
 // work questions, about, the declaration) is asked later, in the artist portal under Profile →
-// Complete Your Profile. Joining is only through here (no WhatsApp). The answers so far are kept as
+// Complete Your Details. Joining is only through here (no WhatsApp). The answers so far are kept as
 // a draft in this browser; a draft from an earlier visit says whose it is, with "Not You? Start
 // Again". Test mode: nothing is required, and the profile is kept in this browser
 // (localStorage `aod-mock-applications`), where the admin's Applications page shows it.
@@ -158,10 +158,10 @@ export function ApplyForm() {
         <p className="mt-6 text-2xl font-medium tabular-nums">
           <span className="text-muted">Ref</span> {sent}
         </p>
-        <p className="mt-4 max-w-xl text-lg text-muted">Next, complete your profile in the artist portal: your photo and a few questions about your work, then send it for review.</p>
+        <p className="mt-4 max-w-xl text-lg text-muted">Next, complete your details in the artist portal: your photo, what kind of artist you are, the services you offer and a few questions about your work, then send it for review.</p>
         <div className="mt-10 flex flex-wrap gap-3 max-sm:*:flex-1">
           <Link href="/artists/profile" className={primaryButton}>
-            Complete Your Profile
+            Complete Your Details
           </Link>
         </div>
         <p className="mt-6 text-sm text-muted">Test mode: kept in this browser only. The admin&apos;s Applications page shows it.</p>

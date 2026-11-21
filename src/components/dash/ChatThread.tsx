@@ -5,11 +5,13 @@ import { act, ago, useDb } from "@/lib/mock-db";
 import { btnMain, field } from "./ui";
 
 // One artist's conversation with the team, shared by the admin (Chat With Artists) and the
-// portal (Messages). In the portal every team member shows as "AOD Team".
-export function ChatThread({ artist, side }: { artist: string; side: "team" | "artist" }) {
+// portal (Messages). In the portal every team member shows as "AOD Team". A box of its own height
+// (on request, 2026-11-21: the whole page used to scroll with the chat): only the messages scroll
+// inside it, starting at the newest, and the message box stays at its bottom, as in a chat app.
+export function ChatThread({ artist, side, className = "h-[min(640px,calc(100dvh-17rem))] min-h-[380px]" }: { artist: string; side: "team" | "artist"; className?: string }) {
   const db = useDb()!;
   const [text, setText] = useState("");
-  const end = useRef<HTMLDivElement>(null);
+  const scroller = useRef<HTMLDivElement>(null);
   const list = db.messages.filter((m) => m.artist === artist);
   const name = db.artists.find((a) => a.id === artist)?.name ?? "";
   const unread = side === "team" ? list.some((m) => m.from === "artist" && m.at > (db.teamRead[artist] ?? "")) : list.some((m) => m.from === "team" && m.at > db.artistRead);
@@ -21,13 +23,15 @@ export function ChatThread({ artist, side }: { artist: string; side: "team" | "a
     else act.readByArtist();
   }, [unread, side, artist]);
 
+  // The newest message in view, by scrolling the box itself (never the page).
   useEffect(() => {
-    end.current?.scrollIntoView({ block: "nearest" });
-  }, [list.length]);
+    const box = scroller.current;
+    if (box) box.scrollTop = box.scrollHeight;
+  }, [list.length, artist]);
 
   return (
-    <div className="flex min-h-[420px] flex-col">
-      <div className="flex-1 space-y-3 overflow-y-auto py-2">
+    <div className={`flex flex-col overflow-hidden rounded-2xl border border-line ${className}`}>
+      <div ref={scroller} className="flex-1 space-y-3 overflow-y-auto overscroll-contain p-4 sm:p-5">
         {list.length ? (
           list.map((m) => {
             const mine = m.from === side;
@@ -45,10 +49,9 @@ export function ChatThread({ artist, side }: { artist: string; side: "team" | "a
         ) : (
           <p className="text-muted">No messages yet.</p>
         )}
-        <div ref={end} />
       </div>
       <form
-        className="mt-4 flex gap-2 border-t border-line pt-4"
+        className="flex shrink-0 gap-2 border-t border-line bg-paper p-3"
         onSubmit={(e) => {
           e.preventDefault();
           act.send(artist, side, text);

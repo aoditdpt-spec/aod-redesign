@@ -6,7 +6,7 @@ import { timeRange } from "@/lib/event-time";
 import { act, ago, catName, parseDay, rupees, shortDate, stageLabel, stages, useDb, type Db, type Line, type Stage } from "@/lib/mock-db";
 import { parseWhatsappOrder } from "@/lib/whatsapp-order";
 import { BookingTable } from "./Overview";
-import { Drawer, Head, Loading, Rows, Status, Tabs, TestNote, Title, btn, btnInk, btnMain, btnText, field, label, stageTone, useOpen } from "../ui";
+import { Drawer, Head, Loading, Rows, Status, Tabs, Title, btn, btnInk, btnMain, btnText, field, label, stageTone, useOpen } from "../ui";
 
 // Every order, as a table or a board (drag a card to another stage), with search. A row or card
 // opens the drawer: the details, the stage, the quote, who they need (each kind with how many),
@@ -52,7 +52,6 @@ export function Bookings() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter By Order, Customer Or City" aria-label="Filter bookings" className={`${field} h-9 max-w-xs`} />
       </div>
       <div className="mt-5">{view === "table" ? <BookingTable db={db} rows={rows} onOpen={o.open} /> : <Board rows={matches} onOpen={o.open} />}</div>
-      <TestNote className="mt-10" />
 
       <Drawer open={!!open} onClose={o.close} title={open?.id ?? ""} subtitle={open ? `${open.customer} · ${open.source}` : undefined}>
         {open && <BookingDetail key={open.id} id={open.id} onDeleted={o.close} />}

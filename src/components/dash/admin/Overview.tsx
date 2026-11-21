@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { appStageLabel, ago, hoursLeft, counts, dayDiff, longDate, openStage, rupees, sameMonth, shortDate, stageLabel, stages, teamUnread, useDb, type Db } from "@/lib/mock-db";
 import { downloadCsv, bookingsCsv } from "@/lib/csv";
-import { HeadLink, Head, Loading, Nums, Status, Tabs, TestNote, Title, btn, stageTone, sub, td, th } from "../ui";
+import { HeadLink, Head, Loading, Nums, Status, Tabs, Title, btn, stageTone, sub, td, th } from "../ui";
 
 // Overview (design-tests/test2.html): the day's numbers, the order pipeline and the open orders,
 // new applications, what needs the team, revenue against last month, and the latest activity.
@@ -160,7 +160,6 @@ export function Overview() {
           </ul>
         </div>
       </div>
-      <TestNote className="mt-14" />
     </>
   );
 }

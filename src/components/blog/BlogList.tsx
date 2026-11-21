@@ -52,7 +52,6 @@ export function BlogList() {
           ))}
         </ul>
       )}
-      <p className="mt-16 text-xs text-muted">Test mode: sample posts, and the ones written in the admin in this browser.</p>
     </>
   );
 }

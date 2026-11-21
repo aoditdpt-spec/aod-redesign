@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { COMMISSION, act, ago, caseStatuses, hoursLeft, rupees, useDb } from "@/lib/mock-db";
 import { MonthAgenda, MonthGrid, MonthSwitch } from "../MonthGrid";
-import { Drawer, Head, Loading, Rows, Status, Tabs, TestNote, Title, btn, btnInk, btnMain, field, sub, td, th, useOpen } from "../ui";
+import { Drawer, Head, Loading, Rows, Status, Tabs, Title, btn, btnInk, btnMain, field, sub, td, th, useOpen } from "../ui";
 
 // Calendar: events, applicant meetings and artists' days off (the portal artist's), month by month.
 export function Calendar() {
@@ -77,7 +77,6 @@ export function Calendar() {
           />
         </div>
       </div>
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -190,7 +189,6 @@ export function Payments() {
         {done.length}
       </Head>
       {table(done, false)}
-      <TestNote className="mt-10" />
     </>
   );
 }
@@ -243,7 +241,6 @@ export function Disputes() {
           ))}
         </tbody>
       </table>
-      <TestNote className="mt-10" />
 
       <Drawer open={!!open} onClose={o.close} title={open ? `${open.id} · ${open.about}` : ""} subtitle={open ? `${open.role}, ${open.name}` : undefined}>
         {open && (

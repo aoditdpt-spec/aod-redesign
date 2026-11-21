@@ -48,6 +48,8 @@ export function PortalShell({ children }: { children: ReactNode }) {
             );
           })}
         </nav>
+        {/* Phones: the menu is one scrolling row, so the button ends it. */}
+        <MainSiteLink className="shrink-0 md:hidden" />
         <div className="mt-auto hidden md:block">
           {me && (
             <div className="flex items-center gap-2.5 text-sm">
@@ -58,20 +60,17 @@ export function PortalShell({ children }: { children: ReactNode }) {
               </div>
             </div>
           )}
-          <div className="mt-5 flex gap-4 text-xs text-muted">
+          {/* Back To Main Site, just above Sign Out (on request, 2026-11-21): the portal is its own
+              site (artists.aod.co.in). */}
+          <MainSiteLink className="mt-5" />
+          <div className="mt-4 flex gap-4 text-xs text-muted">
             <Link href="/artists/sign-in" onClick={() => setPortalEmail("")} className="hover:text-ink">
               Sign Out
             </Link>
           </div>
         </div>
       </aside>
-      <main className="min-w-0 max-w-[1120px] px-4 pb-24 pt-5 md:px-12 md:pt-6">
-        {/* Back To Main Site, on every device (the portal is its own site, artists.aod.co.in). */}
-        <div className="mb-5 flex justify-end md:mb-6">
-          <MainSiteLink />
-        </div>
-        {children}
-      </main>
+      <main className="min-w-0 max-w-[1120px] px-4 pb-24 pt-7 md:px-12 md:pt-10">{children}</main>
     </div>
   );
 }

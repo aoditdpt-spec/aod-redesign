@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { act, ago, dayKey, shortDate, slugOf, useDb, type Post, type PostStatus } from "@/lib/mock-db";
 import { Markdown } from "@/components/ui/Markdown";
-import { Drawer, Head, Loading, Status, Tabs, TestNote, Title, btn, btnMain, btnText, field, label, sub, td, th, useOpen } from "../ui";
+import { Drawer, Head, Loading, Status, Tabs, Title, btn, btnMain, btnText, field, label, sub, td, th, useOpen } from "../ui";
 
 // The blog and the newsletter, as on aod.co.in's admin. Blog: write a post in simple Markdown
 // (with a toolbar and a preview), a cover photo, tags, the author and a publish date (a future
@@ -60,7 +60,6 @@ export function Blog() {
           ))}
         </tbody>
       </table>
-      <TestNote className="mt-10" />
       <Drawer open={!!open} onClose={o.close} title={open?.title || "Post"} subtitle={open ? `/blog/${open.slug}` : undefined}>
         {open && <PostEditor key={open.id} post={open} onDone={o.close} />}
       </Drawer>
@@ -301,7 +300,6 @@ export function Newsletter() {
           </section>
         </div>
       )}
-      <TestNote className="mt-10" />
     </>
   );
 }

@@ -267,7 +267,6 @@ function BusinessApp({ company }: { company: Company }) {
           <OrderList orders={orders} onOpen={setOpen} />
         )}
       </div>
-      <p className="mt-16 text-xs text-muted">Test mode: sample data. Your account and orders stay in this browser.</p>
     </>
   );
 }
